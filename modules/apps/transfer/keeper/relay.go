@@ -200,6 +200,9 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 	// if this format isn't found, just process normally
 	// if it is then forward the packet acording to the forwarding data
 
+	// TODO: import distribution keeper here and add a transfer parameter for
+	// % fees from packet forwarding.
+
 	// decode the receiver address
 	receiver, err := sdk.AccAddressFromBech32(data.Receiver)
 	if err != nil {
