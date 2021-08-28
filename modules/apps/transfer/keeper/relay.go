@@ -194,6 +194,12 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		return types.ErrReceiveDisabled
 	}
 
+	// TODO: parse data.Receiver
+	// INCOMING FORMAT: "{address}|{portid}/{channelid}:{address}"
+	// OUTGOING FORMAT: "{address}"
+	// if this format isn't found, just process normally
+	// if it is then forward the packet acording to the forwarding data
+
 	// decode the receiver address
 	receiver, err := sdk.AccAddressFromBech32(data.Receiver)
 	if err != nil {
