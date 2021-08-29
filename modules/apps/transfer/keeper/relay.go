@@ -275,6 +275,10 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 
 		// unescrow tokens
 		escrowAddress := types.GetEscrowAddress(packet.GetDestPort(), packet.GetDestChannel())
+		if finalDest != "" && port != "" && channel != "" {
+			// TODO pull out fee here
+		}
+
 		if err := k.bankKeeper.SendCoins(ctx, escrowAddress, receiver, sdk.NewCoins(token)); err != nil {
 			// NOTE: this error is only expected to occur given an unexpected bug or a malicious
 			// counterparty module. The bug may occur in bank or any part of the code that allows
@@ -299,19 +303,19 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 			)
 		}()
 
-		timeoutHeight := clienttypes.GetSelfHeight(ctx)
-		timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
-
 		if finalDest != "" && port != "" && channel != "" {
 			// calculate fee percentage
 			feePercentage := k.GetProxyFee(ctx)
 			fee := token.Amount.ToDec().Mul(feePercentage)
 			packetAmount := token.Amount.ToDec().Sub(fee)
 
-			// take fee
+			// TODO: move up
 			fp := k.distrKeeper.GetFeePool(ctx)
 			fp.CommunityPool.Add(sdk.NewDecCoinFromDec(token.Denom, fee))
 			k.distrKeeper.SetFeePool(ctx, fp)
+
+			timeoutHeight := clienttypes.GetSelfHeight(ctx)
+			timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
 
 			// send tokens to destination
 			// TODO: deal with rounding?
@@ -369,12 +373,23 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 	}
 
 	if finalDest != "" && port != "" && channel != "" {
+		// TODO pull out fee here
+	}
+
+	// send to receiver
+	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+		ctx, types.ModuleName, receiver, sdk.NewCoins(voucher),
+	); err != nil {
+		return err
+	}
+
+	if finalDest != "" && port != "" && channel != "" {
 		// calculate fee percentage
 		feePercentage := k.GetProxyFee(ctx)
 		fee := voucher.Amount.ToDec().Mul(feePercentage)
 		packetAmount := voucher.Amount.ToDec().Sub(fee)
 
-		// take fee
+		// TODO: move up
 		fp := k.distrKeeper.GetFeePool(ctx)
 		fp.CommunityPool.Add(sdk.NewDecCoinFromDec(voucher.Denom, fee))
 		k.distrKeeper.SetFeePool(ctx, fp)
@@ -399,13 +414,6 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 				labels,
 			)
 		}()
-	}
-
-	// send to receiver
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-		ctx, types.ModuleName, receiver, sdk.NewCoins(voucher),
-	); err != nil {
-		return err
 	}
 
 	defer func() {
