@@ -41,4 +41,10 @@ message Params {
   // receive_enabled enables or disables all cross-chain token transfers to this
   // chain.
   bool receive_enabled = 2 [(gogoproto.moretags) = "yaml:\"receive_enabled\""];
+  // proxy_fee is the percentage fee charged for using the hub as a pass through proxy
+  string ProxyFee           = 3 [
+    (gogoproto.moretags)   = "yaml:\"proxy_fee\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable)   = false
+  ];
 }

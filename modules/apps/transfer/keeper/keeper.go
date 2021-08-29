@@ -25,6 +25,7 @@ type Keeper struct {
 	portKeeper    types.PortKeeper
 	authKeeper    types.AccountKeeper
 	bankKeeper    types.BankKeeper
+	distrKeeper   types.DistributionKeeper
 	scopedKeeper  capabilitykeeper.ScopedKeeper
 }
 
@@ -32,7 +33,8 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryCodec, key sdk.StoreKey, paramSpace paramtypes.Subspace,
 	channelKeeper types.ChannelKeeper, portKeeper types.PortKeeper,
-	authKeeper types.AccountKeeper, bankKeeper types.BankKeeper, scopedKeeper capabilitykeeper.ScopedKeeper,
+	authKeeper types.AccountKeeper, bankKeeper types.BankKeeper,
+	scopedKeeper capabilitykeeper.ScopedKeeper, distrKeeper types.DistributionKeeper,
 ) Keeper {
 
 	// ensure ibc transfer module account is set
@@ -53,6 +55,7 @@ func NewKeeper(
 		portKeeper:    portKeeper,
 		authKeeper:    authKeeper,
 		bankKeeper:    bankKeeper,
+		distrKeeper:   distrKeeper,
 		scopedKeeper:  scopedKeeper,
 	}
 }

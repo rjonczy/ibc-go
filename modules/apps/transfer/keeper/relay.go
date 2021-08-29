@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/armon/go-metrics"
 
@@ -179,6 +180,34 @@ func (k Keeper) SendTransfer(
 	return nil
 }
 
+// For now this assumes one hop, should be better parsing
+func ParseIncomingTransferField(receiverData string) (thischainaddr sdk.AccAddress, finaldestination, port, channel string, err error) {
+	sep1 := strings.Split(receiverData, ":")
+	switch len(sep1) {
+	case 1:
+		thischainaddr, err = sdk.AccAddressFromBech32(receiverData)
+		return
+	case 2:
+		finaldestination = sep1[1]
+	default:
+		err = fmt.Errorf("only supporting one hop transactions for now")
+		return
+	}
+	sep2 := strings.Split(sep1[0], "|")
+	if len(sep2) != 2 {
+		err = fmt.Errorf("formatting incorect, need: '{address}|{portid}/{channelid}:{address}', got: '%s'", receiverData)
+		return
+	}
+	thischainaddr, err = sdk.AccAddressFromBech32(sep2[0])
+	if err != nil {
+		return
+	}
+	sep3 := strings.Split(sep2[1], "/")
+	port = sep3[0]
+	channel = sep3[1]
+	return
+}
+
 // OnRecvPacket processes a cross chain fungible token transfer. If the
 // sender chain is the source of minted tokens then vouchers will be minted
 // and sent to the receiving address. Otherwise if the sender chain is sending
@@ -202,12 +231,16 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 
 	// TODO: import distribution keeper here and add a transfer parameter for
 	// % fees from packet forwarding.
-
-	// decode the receiver address
-	receiver, err := sdk.AccAddressFromBech32(data.Receiver)
+	receiver, finalDest, port, channel, err := ParseIncomingTransferField(data.Receiver)
 	if err != nil {
 		return err
 	}
+
+	// decode the receiver address
+	// ?	receiver, err := sdk.AccAddressFromBech32(data.Receiver)
+	// if err != nil {
+	// return err
+	// }
 
 	labels := []metrics.Label{
 		telemetry.NewLabel(coretypes.LabelSourcePort, packet.GetSourcePort()),
@@ -266,6 +299,39 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 			)
 		}()
 
+		timeoutHeight := clienttypes.GetSelfHeight(ctx)
+		timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
+
+		if finalDest != "" && port != "" && channel != "" {
+			// calculate fee percentage
+			feePercentage := k.GetProxyFee(ctx)
+			fee := token.Amount.ToDec().Mul(feePercentage)
+			packetAmount := token.Amount.ToDec().Sub(fee)
+
+			// take fee
+			fp := k.distrKeeper.GetFeePool(ctx)
+			fp.CommunityPool.Add(sdk.NewDecCoinFromDec(token.Denom, fee))
+			k.distrKeeper.SetFeePool(ctx, fp)
+
+			// send tokens to destination
+			// TODO: deal with rounding?
+			k.SendTransfer(ctx, port, channel, sdk.NewCoin(token.Denom, packetAmount.TruncateInt()), receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
+
+			defer func() {
+				telemetry.SetGaugeWithLabels(
+					[]string{"tx", "msg", "ibc", "transfer"},
+					float32(token.Amount.Int64()),
+					[]metrics.Label{telemetry.NewLabel(coretypes.LabelDenom, token.Denom)},
+				)
+
+				telemetry.IncrCounterWithLabels(
+					[]string{"ibc", types.ModuleName, "send"},
+					1,
+					labels,
+				)
+			}()
+		}
+
 		return nil
 	}
 
@@ -300,6 +366,39 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		ctx, types.ModuleName, sdk.NewCoins(voucher),
 	); err != nil {
 		return err
+	}
+
+	if finalDest != "" && port != "" && channel != "" {
+		// calculate fee percentage
+		feePercentage := k.GetProxyFee(ctx)
+		fee := voucher.Amount.ToDec().Mul(feePercentage)
+		packetAmount := voucher.Amount.ToDec().Sub(fee)
+
+		// take fee
+		fp := k.distrKeeper.GetFeePool(ctx)
+		fp.CommunityPool.Add(sdk.NewDecCoinFromDec(voucher.Denom, fee))
+		k.distrKeeper.SetFeePool(ctx, fp)
+
+		timeoutHeight := clienttypes.GetSelfHeight(ctx)
+		timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
+
+		// send vouchers to destination
+		// TODO: deal with rounding?
+		k.SendTransfer(ctx, port, channel, sdk.NewCoin(voucher.Denom, packetAmount.TruncateInt()), receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
+
+		defer func() {
+			telemetry.SetGaugeWithLabels(
+				[]string{"tx", "msg", "ibc", "transfer"},
+				float32(voucher.Amount.Int64()),
+				[]metrics.Label{telemetry.NewLabel(coretypes.LabelDenom, voucher.Denom)},
+			)
+
+			telemetry.IncrCounterWithLabels(
+				[]string{"ibc", types.ModuleName, "send"},
+				1,
+				labels,
+			)
+		}()
 	}
 
 	// send to receiver

@@ -19,9 +19,15 @@ func (k Keeper) GetReceiveEnabled(ctx sdk.Context) bool {
 	return res
 }
 
+func (k Keeper) GetProxyFee(ctx sdk.Context) sdk.Dec {
+	var res sdk.Dec
+	k.paramSpace.Get(ctx, types.KeyProxyFee, &res)
+	return res
+}
+
 // GetParams returns the total set of ibc-transfer parameters.
 func (k Keeper) GetParams(ctx sdk.Context) types.Params {
-	return types.NewParams(k.GetSendEnabled(ctx), k.GetReceiveEnabled(ctx))
+	return types.NewParams(k.GetSendEnabled(ctx), k.GetReceiveEnabled(ctx), k.GetProxyFee(ctx))
 }
 
 // SetParams sets the total set of ibc-transfer parameters.

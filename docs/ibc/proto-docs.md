@@ -303,6 +303,7 @@ parameter for the denomination to false.
 | ----- | ---- | ----- | ----------- |
 | `send_enabled` | [bool](#bool) |  | send_enabled enables or disables all cross-chain token transfers from this chain. |
 | `receive_enabled` | [bool](#bool) |  | receive_enabled enables or disables all cross-chain token transfers to this chain. |
+| `ProxyFee` | [string](#string) |  | proxy_fee is the percentage fee charged for using the hub as a pass through proxy |
 
 
 

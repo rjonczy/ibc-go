@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strings"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/ibc-go/modules/apps/transfer/types"
@@ -42,7 +43,7 @@ func RandomizedGenState(simState *module.SimulationState) {
 	transferGenesis := types.GenesisState{
 		PortId:      portID,
 		DenomTraces: types.Traces{},
-		Params:      types.NewParams(sendEnabled, receiveEnabled),
+		Params:      types.NewParams(sendEnabled, receiveEnabled, sdk.ZeroDec()),
 	}
 
 	bz, err := json.MarshalIndent(&transferGenesis, "", " ")
