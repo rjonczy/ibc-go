@@ -268,7 +268,6 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 	// if this format isn't found, just process normally
 	// if it is then forward the packet acording to the forwarding data
 	// and take fee
-
 	receiver, finalDest, port, channel, err := ParseIncomingTransferField(data.Receiver)
 	if err != nil {
 		return err
@@ -306,10 +305,8 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		token := sdk.NewCoin(denom, sdk.NewIntFromUint64(data.Amount))
 
 		// unescrow tokens
-		escrowAddress := types.GetEscrowAddress(packet.GetDestPort(), packet.GetDestChannel())
-
-		if err := k.bankKeeper.SendCoins(ctx, escrowAddress, receiver, sdk.NewCoins(token)); err != nil {
-			// NOTE: this error is only expected to occur given an unexpected bug or a malicigious
+		if err := k.bankKeeper.SendCoins(ctx, types.GetEscrowAddress(packet.GetDestPort(), packet.GetDestChannel()), receiver, sdk.NewCoins(token)); err != nil {
+			// NOTE: this error is only expected to occur given an unexpected bug or a malicious
 			// counterparty module. The bug may occur in bank or any part of the code that allows
 			// the escrow address to be drained. A malicious counterparty module could drain the
 			// escrow address by allowing more tokens to be sent back then were escrowed.
@@ -368,16 +365,12 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 	voucher := sdk.NewCoin(voucherDenom, sdk.NewIntFromUint64(data.Amount))
 
 	// mint new tokens if the source of the transfer is the same chain
-	if err := k.bankKeeper.MintCoins(
-		ctx, types.ModuleName, sdk.NewCoins(voucher),
-	); err != nil {
+	if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(voucher)); err != nil {
 		return err
 	}
 
 	// send to receiver
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-		ctx, types.ModuleName, receiver, sdk.NewCoins(voucher),
-	); err != nil {
+	if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, receiver, sdk.NewCoins(voucher)); err != nil {
 		return err
 	}
 
