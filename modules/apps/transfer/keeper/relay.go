@@ -10,6 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/ibc-go/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
@@ -208,6 +209,45 @@ func ParseIncomingTransferField(receiverData string) (thischainaddr sdk.AccAddre
 	return
 }
 
+func (k Keeper) ForwardTransferPacket(ctx sdk.Context, receiver sdk.AccAddress, token sdk.Coin, port, channel, finalDest string, labels []metrics.Label) error {
+	feePercentage := k.GetProxyFee(ctx)
+	feeAmount := token.Amount.ToDec().Mul(feePercentage).RoundInt()
+	packetAmount := token.Amount.Sub(feeAmount)
+	feeCoins := sdk.Coins{sdk.NewCoin(token.Denom, feeAmount)}
+	packetCoin := sdk.NewCoin(token.Denom, packetAmount)
+
+	// TODO: how to dynamic/what should these values be?
+	timeoutHeight := clienttypes.GetSelfHeight(ctx)
+	timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
+
+	// pay fees
+	if feeAmount.IsPositive() {
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, receiver, authtypes.FeeCollectorName, feeCoins); err != nil {
+			return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		}
+	}
+
+	// send tokens to destination
+	if err := k.SendTransfer(ctx, port, channel, packetCoin, receiver, finalDest, timeoutHeight, uint64(time.Second*1000)); err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+	}
+
+	defer func() {
+		telemetry.SetGaugeWithLabels(
+			[]string{"tx", "msg", "ibc", "transfer"},
+			float32(token.Amount.Int64()),
+			[]metrics.Label{telemetry.NewLabel(coretypes.LabelDenom, token.Denom)},
+		)
+
+		telemetry.IncrCounterWithLabels(
+			[]string{"ibc", types.ModuleName, "send"},
+			1,
+			labels,
+		)
+	}()
+	return nil
+}
+
 // OnRecvPacket processes a cross chain fungible token transfer. If the
 // sender chain is the source of minted tokens then vouchers will be minted
 // and sent to the receiving address. Otherwise if the sender chain is sending
@@ -223,24 +263,16 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		return types.ErrReceiveDisabled
 	}
 
-	// TODO: parse data.Receiver
 	// INCOMING FORMAT: "{address}|{portid}/{channelid}:{address}"
 	// OUTGOING FORMAT: "{address}"
 	// if this format isn't found, just process normally
 	// if it is then forward the packet acording to the forwarding data
+	// and take fee
 
-	// TODO: import distribution keeper here and add a transfer parameter for
-	// % fees from packet forwarding.
 	receiver, finalDest, port, channel, err := ParseIncomingTransferField(data.Receiver)
 	if err != nil {
 		return err
 	}
-
-	// decode the receiver address
-	// ?	receiver, err := sdk.AccAddressFromBech32(data.Receiver)
-	// if err != nil {
-	// return err
-	// }
 
 	labels := []metrics.Label{
 		telemetry.NewLabel(coretypes.LabelSourcePort, packet.GetSourcePort()),
@@ -276,25 +308,7 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		// unescrow tokens
 		escrowAddress := types.GetEscrowAddress(packet.GetDestPort(), packet.GetDestChannel())
 
-		var packetAmount sdk.Coin
-		if finalDest != "" && port != "" && channel != "" {
-			// get fee percentage from params
-			feePercentage := k.GetProxyFee(ctx)
-			// calculate the fee
-			fee := token.Amount.ToDec().Mul(feePercentage)
-			// calculate the remaining amount
-			// TODO: possible rounding errors here?
-			packetAmount = sdk.NewCoin(token.Denom, token.Amount.ToDec().Sub(fee).RoundInt())
-
-			// send the fees to the distribution pool
-			fp := k.distrKeeper.GetFeePool(ctx)
-			fp.CommunityPool.Add(sdk.NewDecCoinFromDec(token.Denom, fee))
-			k.distrKeeper.SetFeePool(ctx, fp)
-		} else {
-			packetAmount = token
-		}
-
-		if err := k.bankKeeper.SendCoins(ctx, escrowAddress, receiver, sdk.NewCoins(packetAmount)); err != nil {
+		if err := k.bankKeeper.SendCoins(ctx, escrowAddress, receiver, sdk.NewCoins(token)); err != nil {
 			// NOTE: this error is only expected to occur given an unexpected bug or a malicigious
 			// counterparty module. The bug may occur in bank or any part of the code that allows
 			// the escrow address to be drained. A malicious counterparty module could drain the
@@ -319,25 +333,9 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		}()
 
 		if finalDest != "" && port != "" && channel != "" {
-			timeoutHeight := clienttypes.GetSelfHeight(ctx)
-			timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
-
-			// send tokens to destination
-			k.SendTransfer(ctx, port, channel, packetAmount, receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
-
-			defer func() {
-				telemetry.SetGaugeWithLabels(
-					[]string{"tx", "msg", "ibc", "transfer"},
-					float32(token.Amount.Int64()),
-					[]metrics.Label{telemetry.NewLabel(coretypes.LabelDenom, token.Denom)},
-				)
-
-				telemetry.IncrCounterWithLabels(
-					[]string{"ibc", types.ModuleName, "send"},
-					1,
-					labels,
-				)
-			}()
+			if err := k.ForwardTransferPacket(ctx, receiver, token, port, channel, finalDest, labels); err != nil {
+				return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+			}
 		}
 
 		return nil
@@ -376,49 +374,11 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		return err
 	}
 
-	var packetAmount sdk.Coin
-	if finalDest != "" && port != "" && channel != "" {
-		// calculate fee percentage
-		feePercentage := k.GetProxyFee(ctx)
-		fee := voucher.Amount.ToDec().Mul(feePercentage)
-		packetAmount = sdk.NewCoin(voucher.Denom, voucher.Amount.ToDec().Sub(fee).RoundInt())
-
-		// TODO: move up
-		fp := k.distrKeeper.GetFeePool(ctx)
-		fp.CommunityPool.Add(sdk.NewDecCoinFromDec(voucher.Denom, fee))
-		k.distrKeeper.SetFeePool(ctx, fp)
-	} else {
-		packetAmount = voucher
-	}
-
 	// send to receiver
 	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-		ctx, types.ModuleName, receiver, sdk.NewCoins(packetAmount),
+		ctx, types.ModuleName, receiver, sdk.NewCoins(voucher),
 	); err != nil {
 		return err
-	}
-
-	if finalDest != "" && port != "" && channel != "" {
-
-		timeoutHeight := clienttypes.GetSelfHeight(ctx)
-		timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
-
-		// send vouchers to destination
-		k.SendTransfer(ctx, port, channel, packetAmount, receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
-
-		defer func() {
-			telemetry.SetGaugeWithLabels(
-				[]string{"tx", "msg", "ibc", "transfer"},
-				float32(voucher.Amount.Int64()),
-				[]metrics.Label{telemetry.NewLabel(coretypes.LabelDenom, voucher.Denom)},
-			)
-
-			telemetry.IncrCounterWithLabels(
-				[]string{"ibc", types.ModuleName, "send"},
-				1,
-				labels,
-			)
-		}()
 	}
 
 	defer func() {
@@ -436,6 +396,12 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 			),
 		)
 	}()
+
+	if finalDest != "" && port != "" && channel != "" {
+		if err := k.ForwardTransferPacket(ctx, receiver, voucher, port, channel, finalDest, labels); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
