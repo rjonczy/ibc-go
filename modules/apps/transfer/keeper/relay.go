@@ -275,12 +275,27 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 
 		// unescrow tokens
 		escrowAddress := types.GetEscrowAddress(packet.GetDestPort(), packet.GetDestChannel())
+
+		var packetAmount sdk.Coin
 		if finalDest != "" && port != "" && channel != "" {
-			// TODO pull out fee here
+			// get fee percentage from params
+			feePercentage := k.GetProxyFee(ctx)
+			// calculate the fee
+			fee := token.Amount.ToDec().Mul(feePercentage)
+			// calculate the remaining amount
+			// TODO: possible rounding errors here?
+			packetAmount = sdk.NewCoin(token.Denom, token.Amount.ToDec().Sub(fee).RoundInt())
+
+			// send the fees to the distribution pool
+			fp := k.distrKeeper.GetFeePool(ctx)
+			fp.CommunityPool.Add(sdk.NewDecCoinFromDec(token.Denom, fee))
+			k.distrKeeper.SetFeePool(ctx, fp)
+		} else {
+			packetAmount = token
 		}
 
-		if err := k.bankKeeper.SendCoins(ctx, escrowAddress, receiver, sdk.NewCoins(token)); err != nil {
-			// NOTE: this error is only expected to occur given an unexpected bug or a malicious
+		if err := k.bankKeeper.SendCoins(ctx, escrowAddress, receiver, sdk.NewCoins(packetAmount)); err != nil {
+			// NOTE: this error is only expected to occur given an unexpected bug or a malicigious
 			// counterparty module. The bug may occur in bank or any part of the code that allows
 			// the escrow address to be drained. A malicious counterparty module could drain the
 			// escrow address by allowing more tokens to be sent back then were escrowed.
@@ -304,22 +319,11 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		}()
 
 		if finalDest != "" && port != "" && channel != "" {
-			// calculate fee percentage
-			feePercentage := k.GetProxyFee(ctx)
-			fee := token.Amount.ToDec().Mul(feePercentage)
-			packetAmount := token.Amount.ToDec().Sub(fee)
-
-			// TODO: move up
-			fp := k.distrKeeper.GetFeePool(ctx)
-			fp.CommunityPool.Add(sdk.NewDecCoinFromDec(token.Denom, fee))
-			k.distrKeeper.SetFeePool(ctx, fp)
-
 			timeoutHeight := clienttypes.GetSelfHeight(ctx)
 			timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
 
 			// send tokens to destination
-			// TODO: deal with rounding?
-			k.SendTransfer(ctx, port, channel, sdk.NewCoin(token.Denom, packetAmount.TruncateInt()), receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
+			k.SendTransfer(ctx, port, channel, packetAmount, receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
 
 			defer func() {
 				telemetry.SetGaugeWithLabels(
@@ -372,34 +376,35 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		return err
 	}
 
-	if finalDest != "" && port != "" && channel != "" {
-		// TODO pull out fee here
-	}
-
-	// send to receiver
-	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
-		ctx, types.ModuleName, receiver, sdk.NewCoins(voucher),
-	); err != nil {
-		return err
-	}
-
+	var packetAmount sdk.Coin
 	if finalDest != "" && port != "" && channel != "" {
 		// calculate fee percentage
 		feePercentage := k.GetProxyFee(ctx)
 		fee := voucher.Amount.ToDec().Mul(feePercentage)
-		packetAmount := voucher.Amount.ToDec().Sub(fee)
+		packetAmount = sdk.NewCoin(voucher.Denom, voucher.Amount.ToDec().Sub(fee).RoundInt())
 
 		// TODO: move up
 		fp := k.distrKeeper.GetFeePool(ctx)
 		fp.CommunityPool.Add(sdk.NewDecCoinFromDec(voucher.Denom, fee))
 		k.distrKeeper.SetFeePool(ctx, fp)
+	} else {
+		packetAmount = voucher
+	}
+
+	// send to receiver
+	if err := k.bankKeeper.SendCoinsFromModuleToAccount(
+		ctx, types.ModuleName, receiver, sdk.NewCoins(packetAmount),
+	); err != nil {
+		return err
+	}
+
+	if finalDest != "" && port != "" && channel != "" {
 
 		timeoutHeight := clienttypes.GetSelfHeight(ctx)
 		timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
 
 		// send vouchers to destination
-		// TODO: deal with rounding?
-		k.SendTransfer(ctx, port, channel, sdk.NewCoin(voucher.Denom, packetAmount.TruncateInt()), receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
+		k.SendTransfer(ctx, port, channel, packetAmount, receiver, finalDest, timeoutHeight, uint64(time.Second*1000))
 
 		defer func() {
 			telemetry.SetGaugeWithLabels(
