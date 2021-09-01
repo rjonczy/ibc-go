@@ -210,8 +210,7 @@ func ParseIncomingTransferField(receiverData string) (thischainaddr sdk.AccAddre
 }
 
 func (k Keeper) ForwardTransferPacket(ctx sdk.Context, receiver sdk.AccAddress, token sdk.Coin, port, channel, finalDest string, labels []metrics.Label) error {
-	feePercentage := k.GetProxyFee(ctx)
-	feeAmount := token.Amount.ToDec().Mul(feePercentage).RoundInt()
+	feeAmount := token.Amount.ToDec().Mul(k.GetProxyFee(ctx)).RoundInt()
 	packetAmount := token.Amount.Sub(feeAmount)
 	feeCoins := sdk.Coins{sdk.NewCoin(token.Denom, feeAmount)}
 	packetCoin := sdk.NewCoin(token.Denom, packetAmount)
