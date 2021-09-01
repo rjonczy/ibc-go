@@ -219,6 +219,10 @@ func (k Keeper) ForwardTransferPacket(ctx sdk.Context, receiver sdk.AccAddress, 
 	timeoutHeight := clienttypes.GetSelfHeight(ctx)
 	timeoutHeight.RevisionHeight = timeoutHeight.RevisionHeight + 1000
 
+	// TODO: this is hardcoded to handle the relayer demo we have built
+	timeoutHeight.RevisionNumber = 2
+	timeoutTime := time.Now().Add(1 * time.Hour).UnixNano()
+
 	// pay fees
 	if feeAmount.IsPositive() {
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, receiver, authtypes.FeeCollectorName, feeCoins); err != nil {
@@ -227,7 +231,7 @@ func (k Keeper) ForwardTransferPacket(ctx sdk.Context, receiver sdk.AccAddress, 
 	}
 
 	// send tokens to destination
-	if err := k.SendTransfer(ctx, port, channel, packetCoin, receiver, finalDest, timeoutHeight, uint64(time.Second*1000)); err != nil {
+	if err := k.SendTransfer(ctx, port, channel, packetCoin, receiver, finalDest, timeoutHeight, uint64(timeoutTime)); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
 	}
 
