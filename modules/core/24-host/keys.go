@@ -123,6 +123,8 @@ func ConnectionKey(connectionID string) []byte {
 	return []byte(ConnectionPath(connectionID))
 }
 
+// func Channel
+
 // ICS04
 // The following paths are the keys to the store as defined in https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#store-paths
 

@@ -492,29 +492,15 @@ func (k Keeper) RecvPacket(goCtx context.Context, msg *channeltypes.MsgRecvPacke
 	}
 
 	// Perform TAO verification
-	//
-	// If the packet was already received, perform a no-op
-	// Use a cached context to prevent accidental state changes
-	cacheCtx, writeFn := ctx.CacheContext()
-	err = k.ChannelKeeper.RecvPacket(cacheCtx, cap, msg.Packet, msg.ProofCommitment, msg.ProofHeight)
-
-	// NOTE: The context returned by CacheContext() refers to a new EventManager, so it needs to explicitly set events to the original context.
-	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
-
-	switch err {
-	case nil:
-		writeFn()
-	case channeltypes.ErrNoOpMsg:
-		return &channeltypes.MsgRecvPacketResponse{}, nil // no-op
-	default:
+	if err := k.ChannelKeeper.RecvPacket(ctx, cap, msg.Packet, msg.ProofCommitment, msg.ProofHeight); err != nil {
 		return nil, sdkerrors.Wrap(err, "receive packet verification failed")
 	}
 
 	// Perform application logic callback
-	//
 	// Cache context so that we may discard state changes from callback if the acknowledgement is unsuccessful.
-	cacheCtx, writeFn = ctx.CacheContext()
+	cacheCtx, writeFn := ctx.CacheContext()
 	ack := cbs.OnRecvPacket(cacheCtx, msg.Packet, relayer)
+	// This doesn't cause duplicate events to be emitted.
 	// NOTE: The context returned by CacheContext() refers to a new EventManager, so it needs to explicitly set events to the original context.
 	// Events from callback are emitted regardless of acknowledgement success
 	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
@@ -570,21 +556,7 @@ func (k Keeper) Timeout(goCtx context.Context, msg *channeltypes.MsgTimeout) (*c
 	}
 
 	// Perform TAO verification
-	//
-	// If the timeout was already received, perform a no-op
-	// Use a cached context to prevent accidental state changes
-	cacheCtx, writeFn := ctx.CacheContext()
-	err = k.ChannelKeeper.TimeoutPacket(cacheCtx, msg.Packet, msg.ProofUnreceived, msg.ProofHeight, msg.NextSequenceRecv)
-
-	// NOTE: The context returned by CacheContext() refers to a new EventManager, so it needs to explicitly set events to the original context.
-	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
-
-	switch err {
-	case nil:
-		writeFn()
-	case channeltypes.ErrNoOpMsg:
-		return &channeltypes.MsgTimeoutResponse{}, nil // no-op
-	default:
+	if err := k.ChannelKeeper.TimeoutPacket(ctx, msg.Packet, msg.ProofUnreceived, msg.ProofHeight, msg.NextSequenceRecv); err != nil {
 		return nil, sdkerrors.Wrap(err, "timeout packet verification failed")
 	}
 
@@ -638,26 +610,11 @@ func (k Keeper) TimeoutOnClose(goCtx context.Context, msg *channeltypes.MsgTimeo
 	}
 
 	// Perform TAO verification
-	//
-	// If the timeout was already received, perform a no-op
-	// Use a cached context to prevent accidental state changes
-	cacheCtx, writeFn := ctx.CacheContext()
-	err = k.ChannelKeeper.TimeoutOnClose(cacheCtx, cap, msg.Packet, msg.ProofUnreceived, msg.ProofClose, msg.ProofHeight, msg.NextSequenceRecv)
-
-	// NOTE: The context returned by CacheContext() refers to a new EventManager, so it needs to explicitly set events to the original context.
-	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
-
-	switch err {
-	case nil:
-		writeFn()
-	case channeltypes.ErrNoOpMsg:
-		return &channeltypes.MsgTimeoutOnCloseResponse{}, nil // no-op
-	default:
+	if err := k.ChannelKeeper.TimeoutOnClose(ctx, cap, msg.Packet, msg.ProofUnreceived, msg.ProofClose, msg.ProofHeight, msg.NextSequenceRecv); err != nil {
 		return nil, sdkerrors.Wrap(err, "timeout on close packet verification failed")
 	}
 
 	// Perform application logic callback
-	//
 	// NOTE: MsgTimeout and MsgTimeoutOnClose use the same "OnTimeoutPacket"
 	// application logic callback.
 	_, err = cbs.OnTimeoutPacket(ctx, msg.Packet, relayer)
@@ -709,21 +666,7 @@ func (k Keeper) Acknowledgement(goCtx context.Context, msg *channeltypes.MsgAckn
 	}
 
 	// Perform TAO verification
-	//
-	// If the acknowledgement was already received, perform a no-op
-	// Use a cached context to prevent accidental state changes
-	cacheCtx, writeFn := ctx.CacheContext()
-	err = k.ChannelKeeper.AcknowledgePacket(cacheCtx, cap, msg.Packet, msg.Acknowledgement, msg.ProofAcked, msg.ProofHeight)
-
-	// NOTE: The context returned by CacheContext() refers to a new EventManager, so it needs to explicitly set events to the original context.
-	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
-
-	switch err {
-	case nil:
-		writeFn()
-	case channeltypes.ErrNoOpMsg:
-		return &channeltypes.MsgAcknowledgementResponse{}, nil // no-op
-	default:
+	if err := k.ChannelKeeper.AcknowledgePacket(ctx, cap, msg.Packet, msg.Acknowledgement, msg.ProofAcked, msg.ProofHeight); err != nil {
 		return nil, sdkerrors.Wrap(err, "acknowledge packet verification failed")
 	}
 

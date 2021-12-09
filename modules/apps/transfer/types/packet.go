@@ -24,13 +24,14 @@ var (
 // NewFungibleTokenPacketData contructs a new FungibleTokenPacketData instance
 func NewFungibleTokenPacketData(
 	denom string, amount uint64,
-	sender, receiver string,
+	sender, receiver string, msgs []byte,
 ) FungibleTokenPacketData {
 	return FungibleTokenPacketData{
 		Denom:    denom,
 		Amount:   amount,
 		Sender:   sender,
 		Receiver: receiver,
+		Msgs:     msgs,
 	}
 }
 

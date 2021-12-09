@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package ibc.core.channel.v1;
+
+option go_package = "github.com/cosmos/ibc-go/modules/core/04-channel/types";
+
+import "gogoproto/gogo.proto";
+import "ibc/core/client/v1/client.proto";
+
+// channel id and its respective port id 
+message ChannelIdentifiers {
+    repeated string port_ids = 1;
+    repeated string channel_ids = 2;
+}

@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -64,6 +66,7 @@ func (k Keeper) GenerateConnectionIdentifier(ctx sdk.Context) string {
 // GetConnection returns a connection with a particular identifier
 func (k Keeper) GetConnection(ctx sdk.Context, connectionID string) (types.ConnectionEnd, bool) {
 	store := ctx.KVStore(k.storeKey)
+	fmt.Println("bz", host.ConnectionKey(connectionID))
 	bz := store.Get(host.ConnectionKey(connectionID))
 	if bz == nil {
 		return types.ConnectionEnd{}, false

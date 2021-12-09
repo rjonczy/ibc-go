@@ -18,7 +18,7 @@ const (
 //nolint:interfacer
 func NewMsgTransfer(
 	sourcePort, sourceChannel string,
-	token sdk.Coin, sender, receiver string,
+	token sdk.Coin, sender, receiver string, msgs []byte,
 	timeoutHeight clienttypes.Height, timeoutTimestamp uint64,
 ) *MsgTransfer {
 	return &MsgTransfer{
@@ -29,6 +29,7 @@ func NewMsgTransfer(
 		Receiver:         receiver,
 		TimeoutHeight:    timeoutHeight,
 		TimeoutTimestamp: timeoutTimestamp,
+		ExecuteMessages:  msgs,
 	}
 }
 

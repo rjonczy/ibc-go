@@ -267,8 +267,8 @@ func (suite *KeeperTestSuite) TestRecvPacket() {
 			// attempts to receive packet 2 without receiving packet 1
 			channelCap = suite.chainB.GetChannelCapability(path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID)
 		}, true},
-		{"packet already relayed ORDERED channel (no-op)", func() {
-			expError = types.ErrNoOpMsg
+		{"packet already relayed ORDERED channel", func() {
+			expError = types.ErrPacketReceived
 
 			path.SetChannelOrdered()
 			suite.coordinator.Setup(path)
@@ -281,8 +281,8 @@ func (suite *KeeperTestSuite) TestRecvPacket() {
 			err = path.EndpointB.RecvPacket(packet.(types.Packet))
 			suite.Require().NoError(err)
 		}, false},
-		{"packet already relayed UNORDERED channel (no-op)", func() {
-			expError = types.ErrNoOpMsg
+		{"packet already relayed UNORDERED channel", func() {
+			expError = types.ErrPacketReceived
 
 			// setup uses an UNORDERED channel
 			suite.coordinator.Setup(path)
@@ -428,7 +428,7 @@ func (suite *KeeperTestSuite) TestRecvPacket() {
 			path.EndpointB.UpdateClient()
 		}, false},
 		{"receipt already stored", func() {
-			expError = types.ErrNoOpMsg
+			expError = types.ErrPacketReceived
 			suite.coordinator.Setup(path)
 
 			packet = types.NewPacket(ibctesting.MockPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, disabledTimeoutTimestamp)
@@ -617,8 +617,8 @@ func (suite *KeeperTestSuite) TestAcknowledgePacket() {
 
 			channelCap = suite.chainA.GetChannelCapability(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID)
 		}, true},
-		{"packet already acknowledged ordered channel (no-op)", func() {
-			expError = types.ErrNoOpMsg
+		{"packet already acknowledged ordered channel", func() {
+			expError = types.ErrPacketCommitmentNotFound
 
 			path.SetChannelOrdered()
 			suite.coordinator.Setup(path)
@@ -636,8 +636,8 @@ func (suite *KeeperTestSuite) TestAcknowledgePacket() {
 			err = path.EndpointA.AcknowledgePacket(packet, ack.Acknowledgement())
 			suite.Require().NoError(err)
 		}, false},
-		{"packet already acknowledged unordered channel (no-op)", func() {
-			expError = types.ErrNoOpMsg
+		{"packet already acknowledged unordered channel", func() {
+			expError = types.ErrPacketCommitmentNotFound
 
 			// setup uses an UNORDERED channel
 			suite.coordinator.Setup(path)
@@ -738,7 +738,7 @@ func (suite *KeeperTestSuite) TestAcknowledgePacket() {
 			channelCap = suite.chainA.GetChannelCapability(path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID)
 		}, false},
 		{"packet hasn't been sent", func() {
-			expError = types.ErrNoOpMsg
+			expError = types.ErrPacketCommitmentNotFound
 
 			// packet commitment never written
 			suite.coordinator.Setup(path)

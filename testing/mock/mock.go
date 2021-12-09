@@ -3,7 +3,6 @@ package mock
 import (
 	"bytes"
 	"encoding/json"
-	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -28,14 +27,12 @@ const (
 )
 
 var (
-	MockAcknowledgement             = channeltypes.NewResultAcknowledgement([]byte("mock acknowledgement"))
-	MockFailAcknowledgement         = channeltypes.NewErrorAcknowledgement("mock failed acknowledgement")
-	MockPacketData                  = []byte("mock packet data")
-	MockFailPacketData              = []byte("mock failed packet data")
-	MockAsyncPacketData             = []byte("mock async packet data")
-	MockRecvCanaryCapabilityName    = "mock receive canary capability name"
-	MockAckCanaryCapabilityName     = "mock acknowledgement canary capability name"
-	MockTimeoutCanaryCapabilityName = "mock timeout canary capability name"
+	MockAcknowledgement      = channeltypes.NewResultAcknowledgement([]byte("mock acknowledgement"))
+	MockFailAcknowledgement  = channeltypes.NewErrorAcknowledgement("mock failed acknowledgement")
+	MockPacketData           = []byte("mock packet data")
+	MockFailPacketData       = []byte("mock failed packet data")
+	MockAsyncPacketData      = []byte("mock async packet data")
+	MockCanaryCapabilityName = "mock canary capability name"
 )
 
 var _ porttypes.IBCModule = AppModule{}
@@ -197,12 +194,7 @@ func (am AppModule) OnChanCloseConfirm(sdk.Context, string, string) error {
 // OnRecvPacket implements the IBCModule interface.
 func (am AppModule) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress) exported.Acknowledgement {
 	// set state by claiming capability to check if revert happens return
-	_, err := am.scopedKeeper.NewCapability(ctx, MockRecvCanaryCapabilityName+strconv.Itoa(int(packet.GetSequence())))
-	if err != nil {
-		// application callback called twice on same packet sequence
-		// must never occur
-		panic(err)
-	}
+	am.scopedKeeper.NewCapability(ctx, MockCanaryCapabilityName)
 	if bytes.Equal(MockPacketData, packet.GetData()) {
 		return MockAcknowledgement
 	} else if bytes.Equal(MockAsyncPacketData, packet.GetData()) {
@@ -213,25 +205,11 @@ func (am AppModule) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, re
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface.
-func (am AppModule) OnAcknowledgementPacket(ctx sdk.Context, packet channeltypes.Packet, _ []byte, _ sdk.AccAddress) (*sdk.Result, error) {
-	_, err := am.scopedKeeper.NewCapability(ctx, MockAckCanaryCapabilityName+strconv.Itoa(int(packet.GetSequence())))
-	if err != nil {
-		// application callback called twice on same packet sequence
-		// must never occur
-		panic(err)
-	}
-
-	return nil, nil
+func (am AppModule) OnAcknowledgementPacket(sdk.Context, channeltypes.Packet, []byte, sdk.AccAddress) error {
+	return nil
 }
 
 // OnTimeoutPacket implements the IBCModule interface.
-func (am AppModule) OnTimeoutPacket(ctx sdk.Context, packet channeltypes.Packet, _ sdk.AccAddress) (*sdk.Result, error) {
-	_, err := am.scopedKeeper.NewCapability(ctx, MockTimeoutCanaryCapabilityName+strconv.Itoa(int(packet.GetSequence())))
-	if err != nil {
-		// application callback called twice on same packet sequence
-		// must never occur
-		panic(err)
-	}
-
-	return nil, nil
+func (am AppModule) OnTimeoutPacket(sdk.Context, channeltypes.Packet, sdk.AccAddress) error {
+	return nil
 }

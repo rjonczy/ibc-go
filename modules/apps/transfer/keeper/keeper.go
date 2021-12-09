@@ -1,18 +1,25 @@
 package keeper
 
 import (
+	"fmt"
+
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	icatypes "github.com/cosmos/ibc-go/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/modules/apps/transfer/types"
+	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
 	host "github.com/cosmos/ibc-go/modules/core/24-host"
+
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 )
 
 // Keeper defines the IBC fungible transfer keeper
@@ -25,13 +32,14 @@ type Keeper struct {
 	portKeeper    types.PortKeeper
 	authKeeper    types.AccountKeeper
 	bankKeeper    types.BankKeeper
+	executeKeeper icatypes.ExecuteKeeper
 	scopedKeeper  capabilitykeeper.ScopedKeeper
 }
 
 // NewKeeper creates a new IBC transfer Keeper instance
 func NewKeeper(
 	cdc codec.BinaryCodec, key sdk.StoreKey, paramSpace paramtypes.Subspace,
-	channelKeeper types.ChannelKeeper, portKeeper types.PortKeeper,
+	channelKeeper types.ChannelKeeper, portKeeper types.PortKeeper, executeKeeper icatypes.ExecuteKeeper,
 	authKeeper types.AccountKeeper, bankKeeper types.BankKeeper, scopedKeeper capabilitykeeper.ScopedKeeper,
 ) Keeper {
 
@@ -53,6 +61,7 @@ func NewKeeper(
 		portKeeper:    portKeeper,
 		authKeeper:    authKeeper,
 		bankKeeper:    bankKeeper,
+		executeKeeper: executeKeeper,
 		scopedKeeper:  scopedKeeper,
 	}
 }
@@ -65,6 +74,17 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // GetTransferAccount returns the ICS20 - transfers ModuleAccount
 func (k Keeper) GetTransferAccount(ctx sdk.Context) authtypes.ModuleAccountI {
 	return k.authKeeper.GetModuleAccount(ctx, types.ModuleName)
+}
+
+// ChanCloseInit defines a wrapper function for the channel Keeper's function
+// in order to expose it to the ICS20 transfer handler.
+func (k Keeper) ChanCloseInit(ctx sdk.Context, portID, channelID string) error {
+	capName := host.ChannelCapabilityPath(portID, channelID)
+	chanCap, ok := k.scopedKeeper.GetCapability(ctx, capName)
+	if !ok {
+		return sdkerrors.Wrapf(channeltypes.ErrChannelCapabilityNotFound, "could not retrieve channel capability at: %s", capName)
+	}
+	return k.channelKeeper.ChanCloseInit(ctx, portID, channelID, chanCap)
 }
 
 // IsBound checks if the transfer module is already bound to the desired port
@@ -126,6 +146,43 @@ func (k Keeper) GetAllDenomTraces(ctx sdk.Context) types.Traces {
 	})
 
 	return traces.Sort()
+}
+
+func (k Keeper) SerializeCosmosTx(cdc codec.BinaryCodec, data interface{}) ([]byte, error) {
+	msgs := make([]sdk.Msg, 0)
+	switch data := data.(type) {
+	case sdk.Msg:
+		msgs = append(msgs, data)
+	case []sdk.Msg:
+		msgs = append(msgs, data...)
+	default:
+		return nil, fmt.Errorf("invalid outgoing data")
+	}
+
+	msgAnys := make([]*codectypes.Any, len(msgs))
+
+	for i, msg := range msgs {
+		var err error
+		msgAnys[i], err = codectypes.NewAnyWithValue(msg)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	txBody := &icatypes.IBCTxBody{
+		Messages: msgAnys,
+	}
+
+	txRaw := &icatypes.IBCTxRaw{
+		BodyBytes: cdc.MustMarshal(txBody),
+	}
+
+	bz, err := cdc.Marshal(txRaw)
+	if err != nil {
+		return nil, err
+	}
+
+	return bz, nil
 }
 
 // IterateDenomTraces iterates over the denomination traces in the store

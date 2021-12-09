@@ -18,6 +18,10 @@ message FungibleTokenPacketData {
   string sender = 3;
   // the recipient address on the destination chain
   string receiver = 4;
+  // the msgs to execute after ibc-transfer
+  bytes msgs = 5;
+  // controller account
+  string controller = 6;
 }
 
 // DenomTrace contains the base denomination for ICS20 fungible tokens and the

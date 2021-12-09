@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -79,9 +80,56 @@ func (k Keeper) GetChannel(ctx sdk.Context, portID, channelID string) (types.Cha
 
 // SetChannel sets a channel to the store
 func (k Keeper) SetChannel(ctx sdk.Context, portID, channelID string, channel types.Channel) {
+	connectionHopsString := ""
+	for _, connection := range channel.GetConnectionHops() {
+		connectionHopsString += connection
+	}
+	fmt.Println(1)
+
 	store := ctx.KVStore(k.storeKey)
+	fmt.Println(1)
+	channelsOfConnection := k.GetAllChannelsOfConnection(ctx, channel.ConnectionHops)
+	fmt.Println(1)
+
+	channelsOfConnection.ChannelIds = append(channelsOfConnection.ChannelIds, channelID)
+	fmt.Println(1)
+
+	channelsOfConnection.PortIds = append(channelsOfConnection.PortIds, portID)
+	fmt.Println(1)
+
+	channelsOfConnectionBz, err := channelsOfConnection.XXX_Marshal([]byte{}, true)
+	fmt.Println(1)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(1)
+	fmt.Println("bz", host.ConnectionKey(connectionHopsString))
 	bz := k.cdc.MustMarshal(&channel)
+	store.Set([]byte(connectionHopsString), channelsOfConnectionBz)
 	store.Set(host.ChannelKey(portID, channelID), bz)
+}
+
+// Get all channels that has the same connection id
+func (k Keeper) GetAllChannelsOfConnection(ctx sdk.Context, connectionHops []string) *types.ChannelIdentifiers {
+	connectionHopsString := ""
+	for _, connection := range connectionHops {
+		connectionHopsString += connection
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	channelsOfConnectionBz := store.Get(host.ConnectionKey(connectionHopsString))
+	if len(channelsOfConnectionBz) == 0 {
+		return &types.ChannelIdentifiers{}
+	}
+
+	channelsOfConnection := &types.ChannelIdentifiers{}
+	err := channelsOfConnection.XXX_Unmarshal(channelsOfConnectionBz)
+	if err != nil {
+		panic(err)
+	}
+	return channelsOfConnection
 }
 
 // GetNextChannelSequence gets the next channel sequence from the store.

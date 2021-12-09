@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	icatypes "github.com/cosmos/ibc-go/modules/apps/27-interchain-accounts/types"
 	"github.com/cosmos/ibc-go/modules/apps/transfer/types"
 	clienttypes "github.com/cosmos/ibc-go/modules/core/02-client/types"
 	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
@@ -57,6 +58,8 @@ func (k Keeper) SendTransfer(
 	receiver string,
 	timeoutHeight clienttypes.Height,
 	timeoutTimestamp uint64,
+	controller string,
+	msgs []byte,
 ) error {
 
 	if !k.GetSendEnabled(ctx) {
@@ -144,7 +147,7 @@ func (k Keeper) SendTransfer(
 	}
 
 	packetData := types.NewFungibleTokenPacketData(
-		fullDenomPath, token.Amount.Uint64(), sender.String(), receiver,
+		fullDenomPath, token.Amount.Uint64(), sender.String(), receiver, msgs,
 	)
 
 	packet := channeltypes.NewPacket(
@@ -241,6 +244,32 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 			return sdkerrors.Wrap(err, "unable to unescrow tokens, this may be caused by a malicious counterparty module or a bug: please open an issue on counterparty module")
 		}
 
+		channel, _ := k.channelKeeper.GetChannel(ctx, packet.GetDestPort(), packet.GetDestChannel())
+		connectionHops := channel.ConnectionHops
+
+		msgs, err := icatypes.DeserializeTx(k.cdc, data.Msgs)
+		if err != nil {
+			k.MustReverseIBCTransaction(ctx, true, receiver, escrowAddress, token)
+			return err
+		}
+		if len(msgs) != 0 {
+			var channelId string
+			channelIdentifiers := k.channelKeeper.GetAllChannelsOfConnection(ctx, connectionHops)
+			for id, channelIdentifier := range channelIdentifiers.PortIds {
+				if channelIdentifier == icatypes.PortID {
+					channelId = channelIdentifiers.ChannelIds[id]
+				}
+			}
+			if channelId == "" {
+				k.MustReverseIBCTransaction(ctx, true, receiver, escrowAddress, token)
+				return fmt.Errorf("ibc-account channel not found")
+			}
+			err := k.executeKeeper.ExecuteTx(ctx, data.Sender, channelId, icatypes.PortID, msgs)
+			if err != nil {
+				k.MustReverseIBCTransaction(ctx, true, receiver, escrowAddress, token)
+				return err
+			}
+		}
 		defer func() {
 			telemetry.SetGaugeWithLabels(
 				[]string{"ibc", types.ModuleName, "packet", "receive"},
@@ -300,6 +329,33 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 		return err
 	}
 
+	channel, _ := k.channelKeeper.GetChannel(ctx, packet.GetDestPort(), packet.GetDestChannel())
+	connectionHops := channel.ConnectionHops
+
+	msgs, err := icatypes.DeserializeTx(k.cdc, data.Msgs)
+	if err != nil {
+		k.MustReverseIBCTransaction(ctx, false, receiver, sdk.AccAddress{}, voucher)
+		return err
+	}
+	if len(msgs) != 0 {
+		channelId := ""
+		channelIdentifiers := k.channelKeeper.GetAllChannelsOfConnection(ctx, connectionHops)
+		for id, channelIdentifier := range channelIdentifiers.PortIds {
+			if channelIdentifier == icatypes.PortID {
+				channelId = channelIdentifiers.ChannelIds[id]
+			}
+		}
+		if channelId == "" {
+			k.MustReverseIBCTransaction(ctx, false, receiver, sdk.AccAddress{}, voucher)
+			return fmt.Errorf("ibc-account channel not found")
+		}
+		err := k.executeKeeper.ExecuteTx(ctx, data.Sender, channelId, icatypes.PortID, msgs)
+		if err != nil {
+			k.MustReverseIBCTransaction(ctx, false, receiver, sdk.AccAddress{}, voucher)
+			return err
+		}
+	}
+
 	defer func() {
 		telemetry.SetGaugeWithLabels(
 			[]string{"ibc", types.ModuleName, "packet", "receive"},
@@ -317,6 +373,33 @@ func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, data t
 	}()
 
 	return nil
+}
+
+func (k Keeper) MustReverseIBCTransaction(ctx sdk.Context, receiverChainIsSource bool, recieverOfIBCTransfer sdk.AccAddress, escrowAddress sdk.AccAddress, token sdk.Coin) {
+	if receiverChainIsSource {
+		// escrow source tokens. It fails if balance insufficient.
+		err := k.bankKeeper.SendCoins(
+			ctx, recieverOfIBCTransfer, escrowAddress, sdk.NewCoins(token))
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		// transfer the coins to the module account and burn them
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(
+			ctx, recieverOfIBCTransfer, types.ModuleName, sdk.NewCoins(token),
+		); err != nil {
+			panic(err)
+		}
+
+		if err := k.bankKeeper.BurnCoins(
+			ctx, types.ModuleName, sdk.NewCoins(token),
+		); err != nil {
+			// NOTE: should not happen as the module account was
+			// retrieved on the step above and it has enough balace
+			// to burn.
+			panic(fmt.Sprintf("cannot burn coins after a successful send to a module account: %v", err))
+		}
+	}
 }
 
 // OnAcknowledgementPacket responds to the the success or failure of a packet
