@@ -3,11 +3,14 @@ go 1.17
 module github.com/cosmos/ibc-go/v3
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+replace github.com/cosmos/cosmos-sdk/db => github.com/cosmos/cosmos-sdk/db 2f335a2b8cc4fcfa337c104823fab9f6ecb387da
+replace github.com/cosmos/cosmos-sdk/x/group => github.com/cosmos/cosmos-sdk/x/group 2f335a2b8cc4fcfa337c104823fab9f6ecb387da
+
 
 require (
 	github.com/armon/go-metrics v0.3.10
 	github.com/confio/ics23/go v0.6.6
-	github.com/cosmos/cosmos-sdk v0.44.5
+	github.com/cosmos/cosmos-sdk 2f335a2b8cc4fcfa337c104823fab9f6ecb387da
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
@@ -19,8 +22,8 @@ require (
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tendermint/tendermint v0.34.14
-	github.com/tendermint/tm-db v0.6.4
+	github.com/tendermint/tendermint v0.35.0
+	github.com/tendermint/tm-db v0.6.6
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
 	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.27.1
