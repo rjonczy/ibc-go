@@ -10,9 +10,8 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-const ChainIDPrefix = "testchain"
-
 var (
+	ChainIDPrefix   = "testchain"
 	globalStartTime = time.Date(2020, 1, 2, 0, 0, 0, 0, time.UTC)
 	TimeIncrement   = time.Second * 5
 )
@@ -34,7 +33,7 @@ func NewCoordinator(t *testing.T, n int) *Coordinator {
 		CurrentTime: globalStartTime,
 	}
 
-	for i := 0; i < n; i++ {
+	for i := 1; i <= n; i++ {
 		chainID := GetChainID(i)
 		chains[chainID] = NewTestChain(t, coord, chainID)
 	}
@@ -56,7 +55,6 @@ func (coord *Coordinator) IncrementTime() {
 func (coord *Coordinator) IncrementTimeBy(increment time.Duration) {
 	coord.CurrentTime = coord.CurrentTime.Add(increment).UTC()
 	coord.UpdateTime()
-
 }
 
 // UpdateTime updates all clocks for the TestChains to the current global time.
@@ -106,7 +104,6 @@ func (coord *Coordinator) SetupConnections(path *Path) {
 // are returned within a TestConnection struct. The function expects the connections to be
 // successfully opened otherwise testing will fail.
 func (coord *Coordinator) CreateConnections(path *Path) {
-
 	err := path.EndpointA.ConnOpenInit()
 	require.NoError(coord.t, err)
 
