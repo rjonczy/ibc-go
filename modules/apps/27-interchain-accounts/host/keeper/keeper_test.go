@@ -150,8 +150,8 @@ func (suite *KeeperTestSuite) TestGetInterchainAccountAddress() {
 
 func (suite *KeeperTestSuite) TestGetAllActiveChannels() {
 	var (
-		expectedChannelID string = "test-channel"
-		expectedPortID    string = "test-port"
+		expectedChannelID = "test-channel"
+		expectedPortID    = "test-port"
 	)
 
 	suite.SetupTest()
@@ -184,8 +184,8 @@ func (suite *KeeperTestSuite) TestGetAllActiveChannels() {
 
 func (suite *KeeperTestSuite) TestGetAllInterchainAccounts() {
 	var (
-		expectedAccAddr string = "test-acc-addr"
-		expectedPortID  string = "test-port"
+		expectedAccAddr = "test-acc-addr"
+		expectedPortID  = "test-port"
 	)
 
 	suite.SetupTest()
@@ -231,8 +231,8 @@ func (suite *KeeperTestSuite) TestIsActiveChannel() {
 
 func (suite *KeeperTestSuite) TestSetInterchainAccountAddress() {
 	var (
-		expectedAccAddr string = "test-acc-addr"
-		expectedPortID  string = "test-port"
+		expectedAccAddr = "test-acc-addr"
+		expectedPortID  = "test-port"
 	)
 
 	suite.chainB.GetSimApp().ICAHostKeeper.SetInterchainAccountAddress(suite.chainB.GetContext(), ibctesting.FirstConnectionID, expectedPortID, expectedAccAddr)

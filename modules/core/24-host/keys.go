@@ -20,7 +20,7 @@ const (
 	RouterKey string = ModuleName
 )
 
-// KVStore key prefixes for IBC
+// KeyClientStorePrefix KVStore key prefixes for IBC
 var (
 	KeyClientStorePrefix = []byte("clients")
 )

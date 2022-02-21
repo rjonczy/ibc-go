@@ -35,11 +35,11 @@ func IsPreviousMetadataEqual(previousVersion string, metadata Metadata) bool {
 		return false
 	}
 
-	return (previousMetadata.Version == metadata.Version &&
+	return previousMetadata.Version == metadata.Version &&
 		previousMetadata.ControllerConnectionId == metadata.ControllerConnectionId &&
 		previousMetadata.HostConnectionId == metadata.HostConnectionId &&
 		previousMetadata.Encoding == metadata.Encoding &&
-		previousMetadata.TxType == metadata.TxType)
+		previousMetadata.TxType == metadata.TxType
 }
 
 // ValidateControllerMetadata performs validation of the provided ICS27 controller metadata parameters

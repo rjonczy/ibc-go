@@ -415,7 +415,7 @@ func (suite *KeeperTestSuite) TestVerifyPacketAcknowledgement() {
 			heightDiff = 5
 		}, false},
 		{"verification failed - changed acknowledgement", func() {
-			ack = ibcmock.MockFailAcknowledgement
+			ack = ibcmock.FailAcknowledgement
 		}, false},
 		{"client status is not active - client is expired", func() {
 			clientState := path.EndpointA.GetClientState().(*ibctmtypes.ClientState)
@@ -428,8 +428,8 @@ func (suite *KeeperTestSuite) TestVerifyPacketAcknowledgement() {
 		tc := tc
 
 		suite.Run(tc.name, func() {
-			suite.SetupTest()                 // reset
-			ack = ibcmock.MockAcknowledgement // must be explicitly changed
+			suite.SetupTest()             // reset
+			ack = ibcmock.Acknowledgement // must be explicitly changed
 
 			path = ibctesting.NewPath(suite.chainA, suite.chainB)
 			suite.coordinator.Setup(path)

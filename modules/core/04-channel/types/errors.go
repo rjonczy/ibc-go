@@ -24,17 +24,17 @@ var (
 	ErrAcknowledgementExists     = sdkerrors.Register(SubModuleName, 17, "acknowledgement for packet already exists")
 	ErrInvalidChannelIdentifier  = sdkerrors.Register(SubModuleName, 18, "invalid channel identifier")
 
-	// packets already relayed errors
+	// ErrPacketReceived packets already relayed errors
 	ErrPacketReceived           = sdkerrors.Register(SubModuleName, 19, "packet already received")
 	ErrPacketCommitmentNotFound = sdkerrors.Register(SubModuleName, 20, "packet commitment not found") // may occur for already received acknowledgements or timeouts and in rare cases for packets never sent
 
-	// ORDERED channel error
+	// ErrPacketSequenceOutOfOrder ORDERED channel error
 	ErrPacketSequenceOutOfOrder = sdkerrors.Register(SubModuleName, 21, "packet sequence is out of order")
 
-	// Antehandler error
+	// ErrRedundantTx Antehandler error
 	ErrRedundantTx = sdkerrors.Register(SubModuleName, 22, "packet messages are redundant")
 
-	// Perform a no-op on the current Msg
+	// ErrNoOpMsg Perform a no-op on the current Msg
 	ErrNoOpMsg = sdkerrors.Register(SubModuleName, 23, "message is redundant, no-op will be performed")
 
 	ErrInvalidChannelVersion = sdkerrors.Register(SubModuleName, 24, "invalid channel version")

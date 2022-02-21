@@ -108,7 +108,7 @@ func (suite *KeeperTestSuite) TestHandleRecvPacket() {
 			path.SetChannelOrdered()
 			suite.coordinator.Setup(path)
 			async = true
-			packet = channeltypes.NewPacket(ibcmock.MockAsyncPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, 0)
+			packet = channeltypes.NewPacket(ibcmock.AsyncPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, 0)
 
 			err := path.EndpointA.SendPacket(packet)
 			suite.Require().NoError(err)
@@ -116,7 +116,7 @@ func (suite *KeeperTestSuite) TestHandleRecvPacket() {
 		{"success: UNORDERED - async acknowledgement", func() {
 			suite.coordinator.Setup(path)
 			async = true
-			packet = channeltypes.NewPacket(ibcmock.MockAsyncPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, 0)
+			packet = channeltypes.NewPacket(ibcmock.AsyncPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, 0)
 
 			err := path.EndpointA.SendPacket(packet)
 			suite.Require().NoError(err)
@@ -349,7 +349,7 @@ func (suite *KeeperTestSuite) TestHandleAcknowledgePacket() {
 				proof, proofHeight = path.EndpointB.QueryProof(packetKey)
 			}
 
-			msg := channeltypes.NewMsgAcknowledgement(packet, ibcmock.MockAcknowledgement.Acknowledgement(), proof, proofHeight, suite.chainA.SenderAccount.GetAddress().String())
+			msg := channeltypes.NewMsgAcknowledgement(packet, ibcmock.Acknowledgement.Acknowledgement(), proof, proofHeight, suite.chainA.SenderAccount.GetAddress().String())
 
 			_, err := keeper.Keeper.Acknowledgement(*suite.chainA.App.GetIBCKeeper(), sdk.WrapSDKContext(suite.chainA.GetContext()), msg)
 

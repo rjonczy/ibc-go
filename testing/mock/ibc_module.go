@@ -16,11 +16,11 @@ import (
 // IBCModule implements the ICS26 callbacks for testing/mock.
 type IBCModule struct {
 	appModule *AppModule
-	IBCApp    *MockIBCApp // base application of an IBC middleware stack
+	IBCApp    *IBCApp // base application of an IBC middleware stack
 }
 
 // NewIBCModule creates a new IBCModule given the underlying mock IBC application and scopedKeeper.
-func NewIBCModule(appModule *AppModule, app *MockIBCApp) IBCModule {
+func NewIBCModule(appModule *AppModule, app *IBCApp) IBCModule {
 	appModule.ibcApps = append(appModule.ibcApps, app)
 	return IBCModule{
 		appModule: appModule,
@@ -113,13 +113,13 @@ func (im IBCModule) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet, re
 		panic(err)
 	}
 
-	if bytes.Equal(MockPacketData, packet.GetData()) {
-		return MockAcknowledgement
-	} else if bytes.Equal(MockAsyncPacketData, packet.GetData()) {
+	if bytes.Equal(PacketData, packet.GetData()) {
+		return Acknowledgement
+	} else if bytes.Equal(AsyncPacketData, packet.GetData()) {
 		return nil
 	}
 
-	return MockFailAcknowledgement
+	return FailAcknowledgement
 }
 
 // OnAcknowledgementPacket implements the IBCModule interface.
@@ -156,15 +156,15 @@ func (im IBCModule) OnTimeoutPacket(ctx sdk.Context, packet channeltypes.Packet,
 
 // GetMockRecvCanaryCapabilityName generates a capability name for testing OnRecvPacket functionality.
 func GetMockRecvCanaryCapabilityName(packet channeltypes.Packet) string {
-	return fmt.Sprintf("%s%s%s%s", MockRecvCanaryCapabilityName, packet.GetDestPort(), packet.GetDestChannel(), strconv.Itoa(int(packet.GetSequence())))
+	return fmt.Sprintf("%s%s%s%s", RecvCanaryCapabilityName, packet.GetDestPort(), packet.GetDestChannel(), strconv.Itoa(int(packet.GetSequence())))
 }
 
 // GetMockAckCanaryCapabilityName generates a capability name for OnAcknowledgementPacket functionality.
 func GetMockAckCanaryCapabilityName(packet channeltypes.Packet) string {
-	return fmt.Sprintf("%s%s%s%s", MockAckCanaryCapabilityName, packet.GetSourcePort(), packet.GetSourceChannel(), strconv.Itoa(int(packet.GetSequence())))
+	return fmt.Sprintf("%s%s%s%s", AckCanaryCapabilityName, packet.GetSourcePort(), packet.GetSourceChannel(), strconv.Itoa(int(packet.GetSequence())))
 }
 
 // GetMockTimeoutCanaryCapabilityName generates a capability name for OnTimeoutacket functionality.
 func GetMockTimeoutCanaryCapabilityName(packet channeltypes.Packet) string {
-	return fmt.Sprintf("%s%s%s%s", MockTimeoutCanaryCapabilityName, packet.GetSourcePort(), packet.GetSourceChannel(), strconv.Itoa(int(packet.GetSequence())))
+	return fmt.Sprintf("%s%s%s%s", TimeoutCanaryCapabilityName, packet.GetSourcePort(), packet.GetSourceChannel(), strconv.Itoa(int(packet.GetSequence())))
 }

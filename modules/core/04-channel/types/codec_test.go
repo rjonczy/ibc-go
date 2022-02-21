@@ -23,7 +23,7 @@ func (suite *TypesTestSuite) TestPackAcknowledgement() {
 	}{
 		{
 			"success",
-			&ibcmock.MockAcknowledgement,
+			&ibcmock.Acknowledgement,
 			true,
 		},
 		{

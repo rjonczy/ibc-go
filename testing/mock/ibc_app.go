@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/ibc-go/v3/modules/core/exported"
 )
 
-// MockIBCApp contains IBC application module callbacks as defined in 05-port.
-type MockIBCApp struct {
+// IBCApp MockIBCApp contains IBC application module callbacks as defined in 05-port.
+type IBCApp struct {
 	PortID       string
 	ScopedKeeper capabilitykeeper.ScopedKeeper
 
@@ -87,8 +87,8 @@ type MockIBCApp struct {
 }
 
 // NewMockIBCApp returns a MockIBCApp. An empty PortID indicates the mock app doesn't bind/claim ports.
-func NewMockIBCApp(portID string, scopedKeeper capabilitykeeper.ScopedKeeper) *MockIBCApp {
-	return &MockIBCApp{
+func NewMockIBCApp(portID string, scopedKeeper capabilitykeeper.ScopedKeeper) *IBCApp {
+	return &IBCApp{
 		PortID:       portID,
 		ScopedKeeper: scopedKeeper,
 	}

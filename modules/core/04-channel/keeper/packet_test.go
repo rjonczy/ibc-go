@@ -504,7 +504,7 @@ func (suite *KeeperTestSuite) TestWriteAcknowledgement() {
 			func() {
 				suite.coordinator.Setup(path)
 				packet = types.NewPacket(ibctesting.MockPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, disabledTimeoutTimestamp)
-				ack = ibcmock.MockAcknowledgement
+				ack = ibcmock.Acknowledgement
 				channelCap = suite.chainB.GetChannelCapability(path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID)
 			},
 			true,
@@ -513,13 +513,13 @@ func (suite *KeeperTestSuite) TestWriteAcknowledgement() {
 			// use wrong channel naming
 			suite.coordinator.Setup(path)
 			packet = types.NewPacket(ibctesting.MockPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, ibctesting.InvalidID, ibctesting.InvalidID, timeoutHeight, disabledTimeoutTimestamp)
-			ack = ibcmock.MockAcknowledgement
+			ack = ibcmock.Acknowledgement
 			channelCap = suite.chainB.GetChannelCapability(path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID)
 		}, false},
 		{"channel not open", func() {
 			suite.coordinator.Setup(path)
 			packet = types.NewPacket(ibctesting.MockPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, disabledTimeoutTimestamp)
-			ack = ibcmock.MockAcknowledgement
+			ack = ibcmock.Acknowledgement
 
 			err := path.EndpointB.SetChannelClosed()
 			suite.Require().NoError(err)
@@ -530,7 +530,7 @@ func (suite *KeeperTestSuite) TestWriteAcknowledgement() {
 			func() {
 				suite.coordinator.Setup(path)
 				packet = types.NewPacket(ibctesting.MockPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, disabledTimeoutTimestamp)
-				ack = ibcmock.MockAcknowledgement
+				ack = ibcmock.Acknowledgement
 				channelCap = capabilitytypes.NewCapability(3)
 			},
 			false,
@@ -540,7 +540,7 @@ func (suite *KeeperTestSuite) TestWriteAcknowledgement() {
 			func() {
 				suite.coordinator.Setup(path)
 				packet = types.NewPacket(ibctesting.MockPacketData, 1, path.EndpointA.ChannelConfig.PortID, path.EndpointA.ChannelID, path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID, timeoutHeight, disabledTimeoutTimestamp)
-				ack = ibcmock.MockAcknowledgement
+				ack = ibcmock.Acknowledgement
 				suite.chainB.App.GetIBCKeeper().ChannelKeeper.SetPacketAcknowledgement(suite.chainB.GetContext(), packet.GetDestPort(), packet.GetDestChannel(), packet.GetSequence(), ack.Acknowledgement())
 				channelCap = suite.chainB.GetChannelCapability(path.EndpointB.ChannelConfig.PortID, path.EndpointB.ChannelID)
 			},
@@ -591,7 +591,7 @@ func (suite *KeeperTestSuite) TestAcknowledgePacket() {
 	var (
 		path   *ibctesting.Path
 		packet types.Packet
-		ack    = ibcmock.MockAcknowledgement
+		ack    = ibcmock.Acknowledgement
 
 		channelCap *capabilitytypes.Capability
 		expError   *sdkerrors.Error

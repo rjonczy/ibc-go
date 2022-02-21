@@ -16,10 +16,10 @@ const (
 	SubModuleName string = "client"
 
 	// RouterKey is the message route for IBC client
-	RouterKey string = SubModuleName
+	RouterKey = SubModuleName
 
 	// QuerierRoute is the querier route for IBC client
-	QuerierRoute string = SubModuleName
+	QuerierRoute = SubModuleName
 
 	// KeyNextClientSequence is the key used to store the next client sequence in
 	// the keeper.

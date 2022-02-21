@@ -277,20 +277,20 @@ func (suite *KeeperTestSuite) TestModelBasedRelay() {
 	dirname := "model_based_tests/"
 	files, err := ioutil.ReadDir(dirname)
 	if err != nil {
-		panic(fmt.Errorf("Failed to read model-based test files: %w", err))
+		panic(fmt.Errorf("failed to read model-based test files: %w", err))
 	}
-	for _, file_info := range files {
+	for _, fileInfo := range files {
 		var tlaTestCases = []TlaOnRecvPacketTestCase{}
-		if !strings.HasSuffix(file_info.Name(), ".json") {
+		if !strings.HasSuffix(fileInfo.Name(), ".json") {
 			continue
 		}
-		jsonBlob, err := ioutil.ReadFile(dirname + file_info.Name())
+		jsonBlob, err := ioutil.ReadFile(dirname + fileInfo.Name())
 		if err != nil {
-			panic(fmt.Errorf("Failed to read JSON test fixture: %w", err))
+			panic(fmt.Errorf("failed to read JSON test fixture: %w", err))
 		}
 		err = json.Unmarshal([]byte(jsonBlob), &tlaTestCases)
 		if err != nil {
-			panic(fmt.Errorf("Failed to parse JSON test fixture: %w", err))
+			panic(fmt.Errorf("failed to parse JSON test fixture: %w", err))
 		}
 
 		suite.SetupTest()
@@ -309,7 +309,7 @@ func (suite *KeeperTestSuite) TestModelBasedRelay() {
 				}
 			}
 
-			description := file_info.Name() + " # " + strconv.Itoa(i+1)
+			description := fileInfo.Name() + " # " + strconv.Itoa(i+1)
 			suite.Run(fmt.Sprintf("Case %s", description), func() {
 				seq := uint64(1)
 				packet := channeltypes.NewPacket(tc.packet.Data.GetBytes(), seq, tc.packet.SourcePort, tc.packet.SourceChannel, tc.packet.DestPort, tc.packet.DestChannel, clienttypes.NewHeight(0, 100), 0)

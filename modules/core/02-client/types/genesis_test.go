@@ -1,7 +1,7 @@
 package types_test
 
 import (
-	context "context"
+	"context"
 	"time"
 
 	tmtypes "github.com/tendermint/tendermint/types"

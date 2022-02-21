@@ -28,22 +28,22 @@ import (
 	"github.com/cosmos/ibc-go/v3/testing/simapp"
 )
 
-var DefaultTestingAppInit func() (TestingApp, map[string]json.RawMessage) = SetupTestingApp
+var DefaultTestingAppInit = SetupTestingApp
 
 type TestingApp interface {
 	abci.Application
 
-	// ibc-go additions
+	// GetBaseApp ibc-go additions
 	GetBaseApp() *baseapp.BaseApp
 	GetStakingKeeper() stakingkeeper.Keeper
 	GetIBCKeeper() *keeper.Keeper
 	GetScopedIBCKeeper() capabilitykeeper.ScopedKeeper
 	GetTxConfig() client.TxConfig
 
-	// Implemented by SimApp
+	// AppCodec Implemented by SimApp
 	AppCodec() codec.Codec
 
-	// Implemented by BaseApp
+	// LastCommitID Implemented by BaseApp
 	LastCommitID() storetypes.CommitID
 	LastBlockHeight() int64
 }

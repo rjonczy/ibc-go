@@ -37,9 +37,9 @@ const (
 
 	height = 5
 
-	trustingPeriod time.Duration = time.Hour * 24 * 7 * 2
-	ubdPeriod      time.Duration = time.Hour * 24 * 7 * 3
-	maxClockDrift  time.Duration = time.Second * 10
+	trustingPeriod = time.Hour * 24 * 7 * 2
+	ubdPeriod      = time.Hour * 24 * 7 * 3
+	maxClockDrift  = time.Second * 10
 )
 
 var (

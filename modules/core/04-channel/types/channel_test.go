@@ -9,7 +9,7 @@ import (
 )
 
 func TestChannelValidateBasic(t *testing.T) {
-	counterparty := types.Counterparty{"portidone", "channelidone"}
+	counterparty := types.Counterparty{PortId: "portidone", ChannelId: "channelidone"}
 	testCases := []struct {
 		name    string
 		channel types.Channel
@@ -41,9 +41,9 @@ func TestCounterpartyValidateBasic(t *testing.T) {
 		counterparty types.Counterparty
 		expPass      bool
 	}{
-		{"valid counterparty", types.Counterparty{"portidone", "channelidone"}, true},
-		{"invalid port id", types.Counterparty{"(InvalidPort)", "channelidone"}, false},
-		{"invalid channel id", types.Counterparty{"portidone", "(InvalidChannel)"}, false},
+		{"valid counterparty", types.Counterparty{PortId: "portidone", ChannelId: "channelidone"}, true},
+		{"invalid port id", types.Counterparty{PortId: "(InvalidPort)", ChannelId: "channelidone"}, false},
+		{"invalid channel id", types.Counterparty{PortId: "portidone", ChannelId: "(InvalidChannel)"}, false},
 	}
 
 	for i, tc := range testCases {

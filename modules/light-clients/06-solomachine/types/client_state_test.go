@@ -58,22 +58,22 @@ func (suite *SoloMachineTestSuite) TestClientStateValidateBasic() {
 			},
 			{
 				"sequence is zero",
-				types.NewClientState(0, &types.ConsensusState{solomachine.ConsensusState().PublicKey, solomachine.Diversifier, solomachine.Time}, false),
+				types.NewClientState(0, &types.ConsensusState{PublicKey: solomachine.ConsensusState().PublicKey, Diversifier: solomachine.Diversifier, Timestamp: solomachine.Time}, false),
 				false,
 			},
 			{
 				"timestamp is zero",
-				types.NewClientState(1, &types.ConsensusState{solomachine.ConsensusState().PublicKey, solomachine.Diversifier, 0}, false),
+				types.NewClientState(1, &types.ConsensusState{PublicKey: solomachine.ConsensusState().PublicKey, Diversifier: solomachine.Diversifier}, false),
 				false,
 			},
 			{
 				"diversifier is blank",
-				types.NewClientState(1, &types.ConsensusState{solomachine.ConsensusState().PublicKey, "  ", 1}, false),
+				types.NewClientState(1, &types.ConsensusState{PublicKey: solomachine.ConsensusState().PublicKey, Diversifier: "  ", Timestamp: 1}, false),
 				false,
 			},
 			{
 				"pubkey is empty",
-				types.NewClientState(1, &types.ConsensusState{nil, solomachine.Diversifier, solomachine.Time}, false),
+				types.NewClientState(1, &types.ConsensusState{Diversifier: solomachine.Diversifier, Timestamp: solomachine.Time}, false),
 				false,
 			},
 		}

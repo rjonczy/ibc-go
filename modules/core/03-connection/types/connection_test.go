@@ -29,27 +29,27 @@ func TestConnectionValidateBasic(t *testing.T) {
 	}{
 		{
 			"valid connection",
-			types.ConnectionEnd{clientID, []*types.Version{ibctesting.ConnectionVersion}, types.INIT, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, 500},
+			types.ConnectionEnd{ClientId: clientID, Versions: []*types.Version{ibctesting.ConnectionVersion}, State: types.INIT, Counterparty: types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, DelayPeriod: 500},
 			true,
 		},
 		{
 			"invalid client id",
-			types.ConnectionEnd{"(clientID1)", []*types.Version{ibctesting.ConnectionVersion}, types.INIT, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, 500},
+			types.ConnectionEnd{ClientId: "(clientID1)", Versions: []*types.Version{ibctesting.ConnectionVersion}, State: types.INIT, Counterparty: types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, DelayPeriod: 500},
 			false,
 		},
 		{
 			"empty versions",
-			types.ConnectionEnd{clientID, nil, types.INIT, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, 500},
+			types.ConnectionEnd{ClientId: clientID, State: types.INIT, Counterparty: types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, DelayPeriod: 500},
 			false,
 		},
 		{
 			"invalid version",
-			types.ConnectionEnd{clientID, []*types.Version{{}}, types.INIT, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, 500},
+			types.ConnectionEnd{ClientId: clientID, Versions: []*types.Version{{}}, State: types.INIT, Counterparty: types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, DelayPeriod: 500},
 			false,
 		},
 		{
 			"invalid counterparty",
-			types.ConnectionEnd{clientID, []*types.Version{ibctesting.ConnectionVersion}, types.INIT, types.Counterparty{clientID2, connectionID2, emptyPrefix}, 500},
+			types.ConnectionEnd{ClientId: clientID, Versions: []*types.Version{ibctesting.ConnectionVersion}, State: types.INIT, Counterparty: types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: emptyPrefix}, DelayPeriod: 500},
 			false,
 		},
 	}
@@ -72,10 +72,10 @@ func TestCounterpartyValidateBasic(t *testing.T) {
 		counterparty types.Counterparty
 		expPass      bool
 	}{
-		{"valid counterparty", types.Counterparty{clientID, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, true},
-		{"invalid client id", types.Counterparty{"(InvalidClient)", connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, false},
-		{"invalid connection id", types.Counterparty{clientID, "(InvalidConnection)", commitmenttypes.NewMerklePrefix([]byte("prefix"))}, false},
-		{"invalid prefix", types.Counterparty{clientID, connectionID2, emptyPrefix}, false},
+		{"valid counterparty", types.Counterparty{ClientId: clientID, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, true},
+		{"invalid client id", types.Counterparty{ClientId: "(InvalidClient)", ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, false},
+		{"invalid connection id", types.Counterparty{ClientId: clientID, ConnectionId: "(InvalidConnection)", Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, false},
+		{"invalid prefix", types.Counterparty{ClientId: clientID, ConnectionId: connectionID2, Prefix: emptyPrefix}, false},
 	}
 
 	for i, tc := range testCases {
@@ -98,12 +98,12 @@ func TestIdentifiedConnectionValidateBasic(t *testing.T) {
 	}{
 		{
 			"valid connection",
-			types.NewIdentifiedConnection(clientID, types.ConnectionEnd{clientID, []*types.Version{ibctesting.ConnectionVersion}, types.INIT, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, 500}),
+			types.NewIdentifiedConnection(clientID, types.ConnectionEnd{ClientId: clientID, Versions: []*types.Version{ibctesting.ConnectionVersion}, State: types.INIT, Counterparty: types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, DelayPeriod: 500}),
 			true,
 		},
 		{
 			"invalid connection id",
-			types.NewIdentifiedConnection("(connectionIDONE)", types.ConnectionEnd{clientID, []*types.Version{ibctesting.ConnectionVersion}, types.INIT, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, 500}),
+			types.NewIdentifiedConnection("(connectionIDONE)", types.ConnectionEnd{ClientId: clientID, Versions: []*types.Version{ibctesting.ConnectionVersion}, State: types.INIT, Counterparty: types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, DelayPeriod: 500}),
 			false,
 		},
 	}

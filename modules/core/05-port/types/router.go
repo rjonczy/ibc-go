@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// The router is a map from module name to the IBCModule
+// Router The router is a map from module name to the IBCModule
 // which contains all the module-defined callbacks required by ICS-26
 type Router struct {
 	routes map[string]IBCModule

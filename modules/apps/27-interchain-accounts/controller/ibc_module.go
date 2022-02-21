@@ -94,7 +94,7 @@ func (im IBCModule) OnChanOpenAck(
 	return im.app.OnChanOpenAck(ctx, portID, channelID, counterpartyVersion)
 }
 
-// OnChanOpenAck implements the IBCModule interface
+// OnChanOpenConfirm OnChanOpenAck implements the IBCModule interface
 func (im IBCModule) OnChanOpenConfirm(
 	ctx sdk.Context,
 	portID,

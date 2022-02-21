@@ -3,7 +3,7 @@ package exported
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	proto "github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/proto"
 )
 
 // Status represents the status of a client
@@ -44,7 +44,7 @@ type ClientState interface {
 	GetLatestHeight() Height
 	Validate() error
 
-	// Initialization function
+	// Initialize Initialization function
 	// Clients must validate the initial consensus state, and may store any client-specific metadata
 	// necessary for correct light client operation
 	Initialize(sdk.Context, codec.BinaryCodec, sdk.KVStore, ConsensusState) error
@@ -53,7 +53,7 @@ type ClientState interface {
 	// Clients must return their status. Only Active clients are allowed to process packets.
 	Status(ctx sdk.Context, clientStore sdk.KVStore, cdc codec.BinaryCodec) Status
 
-	// Genesis function
+	// ExportMetadata Genesis function
 	ExportMetadata(sdk.KVStore) []GenesisMetadata
 
 	// Update and Misbehaviour functions
@@ -62,7 +62,7 @@ type ClientState interface {
 	CheckMisbehaviourAndUpdateState(sdk.Context, codec.BinaryCodec, sdk.KVStore, Misbehaviour) (ClientState, error)
 	CheckSubstituteAndUpdateState(ctx sdk.Context, cdc codec.BinaryCodec, subjectClientStore, substituteClientStore sdk.KVStore, substituteClient ClientState) (ClientState, error)
 
-	// Upgrade functions
+	// VerifyUpgradeAndUpdateState Upgrade functions
 	// NOTE: proof heights are not included as upgrade to a new revision is expected to pass only on the last
 	// height committed by the current revision. Clients are responsible for ensuring that the planned last
 	// height of the current revision is somehow encoded in the proof verification process.
@@ -77,7 +77,7 @@ type ClientState interface {
 		proofUpgradeClient,
 		proofUpgradeConsState []byte,
 	) (ClientState, ConsensusState, error)
-	// Utility function that zeroes out any client customizable fields in client state
+	// ZeroCustomFields Utility function that zeroes out any client customizable fields in client state
 	// Ledger enforced fields are maintained while all custom fields are zero values
 	// Used to verify upgrades
 	ZeroCustomFields() ClientState
@@ -231,9 +231,9 @@ type Height interface {
 // GenesisMetadata is a wrapper interface over clienttypes.GenesisMetadata
 // all clients must use the concrete implementation in types
 type GenesisMetadata interface {
-	// return store key that contains metadata without clientID-prefix
+	// GetKey return store key that contains metadata without clientID-prefix
 	GetKey() []byte
-	// returns metadata value
+	// GetValue returns metadata value
 	GetValue() []byte
 }
 

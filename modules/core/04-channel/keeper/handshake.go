@@ -418,7 +418,7 @@ func (k Keeper) WriteOpenConfirmChannel(
 	EmitChannelOpenConfirmEvent(ctx, portID, channelID, channel)
 }
 
-// Closing Handshake
+// ChanCloseInit Closing Handshake
 //
 // This section defines the set of functions required to close a channel handshake
 // as defined in https://github.com/cosmos/ibc/tree/master/spec/core/ics-004-channel-and-packet-semantics#closing-handshake

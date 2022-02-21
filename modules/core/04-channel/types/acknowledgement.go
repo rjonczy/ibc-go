@@ -52,7 +52,7 @@ func (ack Acknowledgement) ValidateBasic() error {
 // considered successful if it is a ResultAcknowledgement. Otherwise it is
 // considered a failed acknowledgement.
 func (ack Acknowledgement) Success() bool {
-	return reflect.TypeOf(ack.Response) == reflect.TypeOf(((*Acknowledgement_Result)(nil)))
+	return reflect.TypeOf(ack.Response) == reflect.TypeOf((*Acknowledgement_Result)(nil))
 }
 
 // Acknowledgement implements the Acknowledgement interface. It returns the

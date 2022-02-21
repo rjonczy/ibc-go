@@ -27,19 +27,19 @@ const (
 )
 
 var (
-	MockAcknowledgement             = channeltypes.NewResultAcknowledgement([]byte("mock acknowledgement"))
-	MockFailAcknowledgement         = channeltypes.NewErrorAcknowledgement("mock failed acknowledgement")
-	MockPacketData                  = []byte("mock packet data")
-	MockFailPacketData              = []byte("mock failed packet data")
-	MockAsyncPacketData             = []byte("mock async packet data")
-	MockRecvCanaryCapabilityName    = "mock receive canary capability name"
-	MockAckCanaryCapabilityName     = "mock acknowledgement canary capability name"
-	MockTimeoutCanaryCapabilityName = "mock timeout canary capability name"
+	Acknowledgement             = channeltypes.NewResultAcknowledgement([]byte("mock acknowledgement"))
+	FailAcknowledgement         = channeltypes.NewErrorAcknowledgement("mock failed acknowledgement")
+	PacketData                  = []byte("mock packet data")
+	FailPacketData              = []byte("mock failed packet data")
+	AsyncPacketData             = []byte("mock async packet data")
+	RecvCanaryCapabilityName    = "mock receive canary capability name"
+	AckCanaryCapabilityName     = "mock acknowledgement canary capability name"
+	TimeoutCanaryCapabilityName = "mock timeout canary capability name"
 )
 
 var _ porttypes.IBCModule = IBCModule{}
 
-// Expected Interface
+// PortKeeper Expected Interface
 // PortKeeper defines the expected IBC port keeper
 type PortKeeper interface {
 	BindPort(ctx sdk.Context, portID string) *capabilitytypes.Capability
@@ -89,7 +89,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule represents the AppModule for the mock module.
 type AppModule struct {
 	AppModuleBasic
-	ibcApps    []*MockIBCApp
+	ibcApps    []*IBCApp
 	portKeeper PortKeeper
 }
 

@@ -26,7 +26,7 @@ func TestValidateGenesis(t *testing.T) {
 			name: "valid genesis",
 			genState: types.NewGenesisState(
 				[]types.IdentifiedConnection{
-					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
+					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
 				},
 				[]types.ConnectionPaths{
 					{clientID, []string{connectionID}},
@@ -40,7 +40,7 @@ func TestValidateGenesis(t *testing.T) {
 			name: "invalid connection",
 			genState: types.NewGenesisState(
 				[]types.IdentifiedConnection{
-					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, "(CLIENTIDONE)", types.Counterparty{clientID, connectionID, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
+					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, "(CLIENTIDONE)", types.Counterparty{ClientId: clientID, ConnectionId: connectionID, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
 				},
 				[]types.ConnectionPaths{
 					{clientID, []string{connectionID}},
@@ -54,7 +54,7 @@ func TestValidateGenesis(t *testing.T) {
 			name: "invalid client id",
 			genState: types.NewGenesisState(
 				[]types.IdentifiedConnection{
-					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
+					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
 				},
 				[]types.ConnectionPaths{
 					{"(CLIENTIDONE)", []string{connectionID}},
@@ -68,7 +68,7 @@ func TestValidateGenesis(t *testing.T) {
 			name: "invalid path",
 			genState: types.NewGenesisState(
 				[]types.IdentifiedConnection{
-					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
+					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
 				},
 				[]types.ConnectionPaths{
 					{clientID, []string{invalidConnectionID}},
@@ -82,7 +82,7 @@ func TestValidateGenesis(t *testing.T) {
 			name: "invalid connection identifier",
 			genState: types.NewGenesisState(
 				[]types.IdentifiedConnection{
-					types.NewIdentifiedConnection("conn-0", types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
+					types.NewIdentifiedConnection("conn-0", types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
 				},
 				[]types.ConnectionPaths{
 					{clientID, []string{connectionID}},
@@ -96,7 +96,7 @@ func TestValidateGenesis(t *testing.T) {
 			name: "next connection sequence is not greater than maximum connection identifier sequence provided",
 			genState: types.NewGenesisState(
 				[]types.IdentifiedConnection{
-					types.NewIdentifiedConnection(types.FormatConnectionIdentifier(10), types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
+					types.NewIdentifiedConnection(types.FormatConnectionIdentifier(10), types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
 				},
 				[]types.ConnectionPaths{
 					{clientID, []string{connectionID}},
@@ -110,7 +110,7 @@ func TestValidateGenesis(t *testing.T) {
 			name: "invalid params",
 			genState: types.NewGenesisState(
 				[]types.IdentifiedConnection{
-					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{clientID2, connectionID2, commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
+					types.NewIdentifiedConnection(connectionID, types.NewConnectionEnd(types.INIT, clientID, types.Counterparty{ClientId: clientID2, ConnectionId: connectionID2, Prefix: commitmenttypes.NewMerklePrefix([]byte("prefix"))}, []*types.Version{ibctesting.ConnectionVersion}, 500)),
 				},
 				[]types.ConnectionPaths{
 					{clientID, []string{connectionID}},

@@ -10,7 +10,7 @@ import (
 	host "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 )
 
-// msg types
+// TypeMsgTransfer msg types
 const (
 	TypeMsgTransfer = "transfer"
 )

@@ -40,7 +40,7 @@ func EmitUpdateClientEvent(ctx sdk.Context, clientID string, clientState exporte
 	})
 }
 
-// EmitUpdateClientEvent emits an upgrade client event
+// EmitUpgradeClientEvent EmitUpdateClientEvent emits an upgrade client event
 func EmitUpgradeClientEvent(ctx sdk.Context, clientID string, clientState exported.ClientState) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(

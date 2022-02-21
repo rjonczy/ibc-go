@@ -125,7 +125,7 @@ func (suite *TypesTestSuite) TestMsgChannelOpenInitValidateBasic() {
 		{"connection id contains non-alpha", types.NewMsgChannelOpenInit(portid, version, types.UNORDERED, []string{invalidConnection}, cpportid, addr), false},
 		{"", types.NewMsgChannelOpenInit(portid, "", types.UNORDERED, connHops, cpportid, addr), true},
 		{"invalid counterparty port id", types.NewMsgChannelOpenInit(portid, version, types.UNORDERED, connHops, invalidPort, addr), false},
-		{"channel not in INIT state", &types.MsgChannelOpenInit{portid, tryOpenChannel, addr}, false},
+		{"channel not in INIT state", &types.MsgChannelOpenInit{PortId: portid, Channel: tryOpenChannel, Signer: addr}, false},
 	}
 
 	for _, tc := range testCases {
@@ -169,7 +169,7 @@ func (suite *TypesTestSuite) TestMsgChannelOpenTryValidateBasic() {
 		{"invalid counterparty port id", types.NewMsgChannelOpenTry(portid, chanid, version, types.UNORDERED, connHops, invalidPort, cpchanid, version, suite.proof, height, addr), false},
 		{"invalid counterparty channel id", types.NewMsgChannelOpenTry(portid, chanid, version, types.UNORDERED, connHops, cpportid, invalidChannel, version, suite.proof, height, addr), false},
 		{"empty proof", types.NewMsgChannelOpenTry(portid, chanid, version, types.UNORDERED, connHops, cpportid, cpchanid, version, emptyProof, height, addr), false},
-		{"channel not in TRYOPEN state", &types.MsgChannelOpenTry{portid, chanid, initChannel, version, suite.proof, height, addr}, false},
+		{"channel not in TRYOPEN state", &types.MsgChannelOpenTry{PortId: portid, PreviousChannelId: chanid, Channel: initChannel, CounterpartyVersion: version, ProofInit: suite.proof, ProofHeight: height, Signer: addr}, false},
 	}
 
 	for _, tc := range testCases {
