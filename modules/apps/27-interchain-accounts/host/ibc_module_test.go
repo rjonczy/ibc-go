@@ -12,7 +12,9 @@ import (
 	abcitypes "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto"
 	tmprotostate "github.com/tendermint/tendermint/proto/tendermint/state"
-//	tmstate "github.com/tendermint/tendermint/state"
+	tmtypes "github.com/tendermint/tendermint/types"
+
+	//	tmstate "github.com/tendermint/tendermint/state"
 
 	"github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
 	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
@@ -767,8 +769,12 @@ func (suite *InterchainAccountsTestSuite) TestABCICodeDeterminism() {
 		},
 	}
 
-//	hash := tmstate.ABCIResponsesResultsHash(&responses)
-//	differentHash := tmstate.ABCIResponsesResultsHash(&differentResponses)
+	hash := ABCIResponsesResultsHash(&responses)
+	differentHash := ABCIResponsesResultsHash(&differentResponses)
 
-//	suite.Require().NotEqual(hash, differentHash)
+	suite.Require().NotEqual(hash, differentHash)
+}
+
+func ABCIResponsesResultsHash(ar *tmprotostate.ABCIResponses) []byte {
+	return tmtypes.NewResults(ar.DeliverTxs).Hash()
 }
