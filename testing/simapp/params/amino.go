@@ -5,7 +5,6 @@ package params
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
 )
 
 // MakeTestEncodingConfig creates an EncodingConfig for an amino based test configuration.
@@ -20,7 +19,6 @@ func MakeTestEncodingConfig() EncodingConfig {
 	return EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
 		Marshaler:         marshaler,
-		TxConfig:          legacytx.StdTxConfig{Cdc: cdc},
 		Amino:             cdc,
 	}
 }
