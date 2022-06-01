@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/binary"
 	"fmt"
 	"math/big"
 	"regexp"
@@ -117,6 +118,14 @@ func (h Height) Increment() exported.Height {
 // IsZero returns true if height revision and revision-height are both 0
 func (h Height) IsZero() bool {
 	return h.RevisionNumber == 0 && h.RevisionHeight == 0
+}
+
+func (h Height) Byte() []byte {
+	bytes := make([]byte, 16)
+	binary.BigEndian.PutUint64(bytes, h.RevisionNumber)
+	binary.BigEndian.PutUint64(bytes[8:], h.RevisionHeight)
+
+	return bytes
 }
 
 // MustParseHeight will attempt to parse a string representation of a height and panic if

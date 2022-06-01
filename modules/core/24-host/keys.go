@@ -91,7 +91,7 @@ func FullConsensusStateKey(clientID string, height exported.Height) []byte {
 // ConsensusStatePath returns the suffix store key for the consensus state at a
 // particular height stored in a client prefixed store.
 func ConsensusStatePath(height exported.Height) string {
-	return fmt.Sprintf("%s/%s", KeyConsensusStatePrefix, height)
+	return fmt.Sprintf("%s/%s", KeyConsensusStatePrefix, height.Byte())
 }
 
 // ConsensusStateKey returns the store key for a the consensus state of a particular

@@ -226,6 +226,7 @@ type Height interface {
 	Increment() Height
 	Decrement() (Height, bool)
 	String() string
+	Byte() []byte
 }
 
 // GenesisMetadata is a wrapper interface over clienttypes.GenesisMetadata
