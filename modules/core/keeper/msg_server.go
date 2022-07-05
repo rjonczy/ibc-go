@@ -9,16 +9,18 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	connectiontypes "github.com/cosmos/ibc-go/v3/modules/core/03-connection/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
-	coretypes "github.com/cosmos/ibc-go/v3/modules/core/types"
+	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	connectiontypes "github.com/cosmos/ibc-go/v4/modules/core/03-connection/types"
+	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
+	coretypes "github.com/cosmos/ibc-go/v4/modules/core/types"
 )
 
-var _ clienttypes.MsgServer = Keeper{}
-var _ connectiontypes.MsgServer = Keeper{}
-var _ channeltypes.MsgServer = Keeper{}
+var (
+	_ clienttypes.MsgServer     = Keeper{}
+	_ connectiontypes.MsgServer = Keeper{}
+	_ channeltypes.MsgServer    = Keeper{}
+)
 
 // CreateClient defines a rpc handler method for MsgCreateClient.
 func (k Keeper) CreateClient(goCtx context.Context, msg *clienttypes.MsgCreateClient) (*clienttypes.MsgCreateClientResponse, error) {
@@ -185,15 +187,17 @@ func (k Keeper) ChannelOpenInit(goCtx context.Context, msg *channeltypes.MsgChan
 	}
 
 	// Perform application logic callback
-	if err = cbs.OnChanOpenInit(ctx, msg.Channel.Ordering, msg.Channel.ConnectionHops, msg.PortId, channelID, cap, msg.Channel.Counterparty, msg.Channel.Version); err != nil {
+	version, err := cbs.OnChanOpenInit(ctx, msg.Channel.Ordering, msg.Channel.ConnectionHops, msg.PortId, channelID, cap, msg.Channel.Counterparty, msg.Channel.Version)
+	if err != nil {
 		return nil, sdkerrors.Wrap(err, "channel open init callback failed")
 	}
 
 	// Write channel into state
-	k.ChannelKeeper.WriteOpenInitChannel(ctx, msg.PortId, channelID, msg.Channel.Ordering, msg.Channel.ConnectionHops, msg.Channel.Counterparty, msg.Channel.Version)
+	k.ChannelKeeper.WriteOpenInitChannel(ctx, msg.PortId, channelID, msg.Channel.Ordering, msg.Channel.ConnectionHops, msg.Channel.Counterparty, version)
 
 	return &channeltypes.MsgChannelOpenInitResponse{
 		ChannelId: channelID,
+		Version:   version,
 	}, nil
 }
 
@@ -232,7 +236,9 @@ func (k Keeper) ChannelOpenTry(goCtx context.Context, msg *channeltypes.MsgChann
 	// Write channel into state
 	k.ChannelKeeper.WriteOpenTryChannel(ctx, msg.PortId, channelID, msg.Channel.Ordering, msg.Channel.ConnectionHops, msg.Channel.Counterparty, version)
 
-	return &channeltypes.MsgChannelOpenTryResponse{}, nil
+	return &channeltypes.MsgChannelOpenTryResponse{
+		Version: version,
+	}, nil
 }
 
 // ChannelOpenAck defines a rpc handler method for MsgChannelOpenAck.

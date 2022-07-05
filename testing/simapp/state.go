@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"time"
 
-	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +20,7 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmtypes "github.com/tendermint/tendermint/types"
 
-	simappparams "github.com/cosmos/ibc-go/v3/testing/simapp/params"
+	simappparams "github.com/cosmos/ibc-go/v4/testing/simapp/params"
 )
 
 // AppStateFn returns the initial application state using a genesis or the simulation parameters.
@@ -29,7 +29,6 @@ import (
 func AppStateFn(cdc codec.JSONCodec, simManager *module.SimulationManager) simtypes.AppStateFn {
 	return func(r *rand.Rand, accs []simtypes.Account, config simtypes.Config,
 	) (appState json.RawMessage, simAccs []simtypes.Account, chainID string, genesisTimestamp time.Time) {
-
 		if FlagGenesisTimeValue == 0 {
 			genesisTimestamp = simtypes.RandTimestamp(r)
 		} else {
@@ -140,11 +139,11 @@ func AppStateRandomizedFn(
 	// number of bonded accounts
 	var (
 		numInitiallyBonded int64
-		initialStake       sdkmath.Int
+		initialStake       math.Int
 	)
 	appParams.GetOrGenerate(
 		cdc, simappparams.StakePerAccount, &initialStake, r,
-		func(r *rand.Rand) { initialStake = sdkmath.NewInt(r.Int63n(1e12)) },
+		func(r *rand.Rand) { initialStake = math.NewInt(r.Int63n(1e12)) },
 	)
 	appParams.GetOrGenerate(
 		cdc, simappparams.InitiallyBondedValidators, &numInitiallyBonded, r,
@@ -170,7 +169,7 @@ func AppStateRandomizedFn(
 		Rand:         r,
 		GenState:     genesisState,
 		Accounts:     accs,
-		InitialStake: initialStake,
+		InitialStake: math.NewInt(initialStake),
 		NumBonded:    numInitiallyBonded,
 		GenTimestamp: genesisTimestamp,
 	}

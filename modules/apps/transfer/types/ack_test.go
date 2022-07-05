@@ -9,33 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/crypto/hd"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
-	"github.com/cosmos/cosmos-sdk/testutil/network"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/ibc-go/v3/testing/simapp/params"
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
-	abcitypes "github.com/tendermint/tendermint/abci/types"
-	tmprotostate "github.com/tendermint/tendermint/proto/tendermint/state"
-	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/ibc-go/v3/modules/apps/transfer/types"
-	ibcclientcli "github.com/cosmos/ibc-go/v3/modules/core/02-client/client/cli"
-	ibctesting "github.com/cosmos/ibc-go/v3/testing"
-	"github.com/cosmos/ibc-go/v3/testing/simapp"
+	ibctesting "github.com/cosmos/ibc-go/v4/testing"
 )
 
-type IntegrationTestSuite struct {
+type TypesTestSuite struct {
 	suite.Suite
 
 	cfg     network.Config
@@ -109,6 +88,7 @@ func NewAppConstructor(encodingCfg params.EncodingConfig) network.AppConstructor
 func TestIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(IntegrationTestSuite))
 }
+<<<<<<< HEAD
 
 // The safety of including ABCI error codes in the acknowledgement rests
 // on the inclusion of these ABCI error codes in the abcitypes.ResposneDeliverTx
@@ -226,3 +206,5 @@ func (suite *TypesTestSuite) TestAcknowledgementError() {
 	suite.Require().NotEqual(ack, ackDifferentABCICode)
 
 }
+=======
+>>>>>>> notional/real-46-branch

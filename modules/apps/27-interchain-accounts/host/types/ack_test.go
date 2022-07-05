@@ -21,7 +21,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/ibc-go/v3/testing/simapp/params"
+	"github.com/cosmos/ibc-go/v4/testing/simapp/params"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -29,10 +29,7 @@ import (
 	tmprotostate "github.com/tendermint/tendermint/proto/tendermint/state"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
-	ibcclientcli "github.com/cosmos/ibc-go/v3/modules/core/02-client/client/cli"
-	ibctesting "github.com/cosmos/ibc-go/v3/testing"
-	"github.com/cosmos/ibc-go/v3/testing/simapp"
+	ibctesting "github.com/cosmos/ibc-go/v4/testing"
 )
 
 type IntegrationTestSuite struct {
@@ -206,22 +203,4 @@ type TypesTestSuite struct {
 
 func TestTypesTestSuite(t *testing.T) {
 	suite.Run(t, new(TypesTestSuite))
-}
-
-// TestAcknowledgementError will verify that only a constant string and
-// ABCI error code are used in constructing the acknowledgement error string
-func (suite *TypesTestSuite) TestAcknowledgementError() {
-	// same ABCI error code used
-	err := sdkerrors.Wrap(sdkerrors.ErrOutOfGas, "error string 1")
-	errSameABCICode := sdkerrors.Wrap(sdkerrors.ErrOutOfGas, "error string 2")
-
-	// different ABCI error code used
-	errDifferentABCICode := sdkerrors.ErrNotFound
-
-	ack := types.NewErrorAcknowledgement(err)
-	ackSameABCICode := types.NewErrorAcknowledgement(errSameABCICode)
-	ackDifferentABCICode := types.NewErrorAcknowledgement(errDifferentABCICode)
-
-	suite.Require().Equal(ack, ackSameABCICode)
-	suite.Require().NotEqual(ack, ackDifferentABCICode)
 }

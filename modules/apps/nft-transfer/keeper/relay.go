@@ -9,11 +9,11 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/nft"
 
-	"github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	host "github.com/cosmos/ibc-go/v3/modules/core/24-host"
-	coretypes "github.com/cosmos/ibc-go/v3/modules/core/types"
+	"github.com/cosmos/ibc-go/v4/modules/apps/nft-transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
+	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	coretypes "github.com/cosmos/ibc-go/v4/modules/core/types"
 )
 
 // SendTransfer handles nft-transfer sending logic.

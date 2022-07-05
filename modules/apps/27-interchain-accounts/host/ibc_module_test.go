@@ -23,7 +23,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	"github.com/cosmos/ibc-go/v3/testing/simapp/params"
+	"github.com/cosmos/ibc-go/v4/testing/simapp/params"
 	"github.com/gogo/protobuf/proto"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/suite"
@@ -32,15 +32,13 @@ import (
 	tmprotostate "github.com/tendermint/tendermint/proto/tendermint/state"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/host/types"
-	icatypes "github.com/cosmos/ibc-go/v3/modules/apps/27-interchain-accounts/types"
-	ibcclientcli "github.com/cosmos/ibc-go/v3/modules/core/02-client/client/cli"
-	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v3/modules/core/04-channel/types"
-	host "github.com/cosmos/ibc-go/v3/modules/core/24-host"
-	"github.com/cosmos/ibc-go/v3/modules/core/exported"
-	ibctesting "github.com/cosmos/ibc-go/v3/testing"
-	"github.com/cosmos/ibc-go/v3/testing/simapp"
+	"github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/host/types"
+	icatypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/types"
+	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
+	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
+	"github.com/cosmos/ibc-go/v4/modules/core/exported"
+	ibctesting "github.com/cosmos/ibc-go/v4/testing"
 )
 
 var (
@@ -106,7 +104,7 @@ func RegisterInterchainAccount(endpoint *ibctesting.Endpoint, owner string) erro
 
 	channelSequence := endpoint.Chain.App.GetIBCKeeper().ChannelKeeper.GetNextChannelSequence(endpoint.Chain.GetContext())
 
-	if err := endpoint.Chain.GetSimApp().ICAControllerKeeper.RegisterInterchainAccount(endpoint.Chain.GetContext(), endpoint.ConnectionID, owner); err != nil {
+	if err := endpoint.Chain.GetSimApp().ICAControllerKeeper.RegisterInterchainAccount(endpoint.Chain.GetContext(), endpoint.ConnectionID, owner, TestVersion); err != nil {
 		return err
 	}
 
@@ -167,7 +165,6 @@ func (suite *InterchainAccountsTestSuite) TestOnChanOpenTry() {
 		malleate func()
 		expPass  bool
 	}{
-
 		{
 			"success", func() {}, true,
 		},
@@ -185,7 +182,6 @@ func (suite *InterchainAccountsTestSuite) TestOnChanOpenTry() {
 				) (string, error) {
 					return "", fmt.Errorf("mock ica auth fails")
 				}
-
 			}, true,
 		},
 		{
@@ -242,10 +238,8 @@ func (suite *InterchainAccountsTestSuite) TestOnChanOpenTry() {
 				suite.Require().Error(err)
 				suite.Require().Equal("", version)
 			}
-
 		})
 	}
-
 }
 
 // Test initiating a ChanOpenAck using the host chain instead of the controller chain
@@ -288,7 +282,6 @@ func (suite *InterchainAccountsTestSuite) TestOnChanOpenConfirm() {
 		malleate func()
 		expPass  bool
 	}{
-
 		{
 			"success", func() {}, true,
 		},
@@ -305,7 +298,6 @@ func (suite *InterchainAccountsTestSuite) TestOnChanOpenConfirm() {
 				) error {
 					return fmt.Errorf("mock ica auth fails")
 				}
-
 			}, true,
 		},
 	}
@@ -342,10 +334,8 @@ func (suite *InterchainAccountsTestSuite) TestOnChanOpenConfirm() {
 			} else {
 				suite.Require().Error(err)
 			}
-
 		})
 	}
-
 }
 
 // OnChanCloseInit on host (chainB)
@@ -370,16 +360,13 @@ func (suite *InterchainAccountsTestSuite) TestOnChanCloseInit() {
 }
 
 func (suite *InterchainAccountsTestSuite) TestOnChanCloseConfirm() {
-	var (
-		path *ibctesting.Path
-	)
+	var path *ibctesting.Path
 
 	testCases := []struct {
 		name     string
 		malleate func()
 		expPass  bool
 	}{
-
 		{
 			"success", func() {}, true,
 		},
@@ -410,15 +397,12 @@ func (suite *InterchainAccountsTestSuite) TestOnChanCloseConfirm() {
 			} else {
 				suite.Require().Error(err)
 			}
-
 		})
 	}
 }
 
 func (suite *InterchainAccountsTestSuite) TestOnRecvPacket() {
-	var (
-		packetData []byte
-	)
+	var packetData []byte
 	testCases := []struct {
 		name          string
 		malleate      func()
@@ -437,7 +421,7 @@ func (suite *InterchainAccountsTestSuite) TestOnRecvPacket() {
 				suite.chainB.GetSimApp().ICAAuthModule.IBCApp.OnRecvPacket = func(
 					ctx sdk.Context, packet channeltypes.Packet, relayer sdk.AccAddress,
 				) exported.Acknowledgement {
-					return channeltypes.NewErrorAcknowledgement("failed OnRecvPacket mock callback")
+					return channeltypes.NewErrorAcknowledgement(fmt.Errorf("failed OnRecvPacket mock callback"))
 				}
 			}, true,
 		},
@@ -517,14 +501,11 @@ func (suite *InterchainAccountsTestSuite) TestOnRecvPacket() {
 			} else {
 				suite.Require().False(ack.Success())
 			}
-
 		})
 	}
-
 }
 
 func (suite *InterchainAccountsTestSuite) TestOnAcknowledgementPacket() {
-
 	testCases := []struct {
 		name     string
 		malleate func()
@@ -578,7 +559,6 @@ func (suite *InterchainAccountsTestSuite) TestOnAcknowledgementPacket() {
 }
 
 func (suite *InterchainAccountsTestSuite) TestOnTimeoutPacket() {
-
 	testCases := []struct {
 		name     string
 		malleate func()
