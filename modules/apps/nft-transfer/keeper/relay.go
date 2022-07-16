@@ -33,15 +33,15 @@ import (
 // For example, assume these steps of transfer occur:
 // A -> B -> C -> A -> C -> B -> A
 //
-//|                    sender  chain                      |                       receiver     chain              |
-//| :-----: | -------------------------: | :------------: | :------------: | -------------------------: | :-----: |
-//|  chain  |                    classID | (port,channel) | (port,channel) |                    classID |  chain  |
-//|    A    |                   nftClass |    (p1,c1)     |    (p2,c2)     |             p2/c2/nftClass |    B    |
-//|    B    |             p2/c2/nftClass |    (p3,c3)     |    (p4,c4)     |       p4/c4/p2/c2/nftClass |    C    |
-//|    C    |       p4/c4/p2/c2/nftClass |    (p5,c5)     |    (p6,c6)     | p6/c6/p4/c4/p2/c2/nftClass |    A    |
-//|    A    | p6/c6/p4/c4/p2/c2/nftClass |    (p6,c6)     |    (p5,c5)     |       p4/c4/p2/c2/nftClass |    C    |
-//|    C    |       p4/c4/p2/c2/nftClass |    (p4,c4)     |    (p3,c3)     |             p2/c2/nftClass |    B    |
-//|    B    |             p2/c2/nftClass |    (p2,c2)     |    (p1,c1)     |                   nftClass |    A    |
+// |                    sender  chain                      |                       receiver     chain              |
+// | :-----: | -------------------------: | :------------: | :------------: | -------------------------: | :-----: |
+// |  chain  |                    classID | (port,channel) | (port,channel) |                    classID |  chain  |
+// |    A    |                   nftClass |    (p1,c1)     |    (p2,c2)     |             p2/c2/nftClass |    B    |
+// |    B    |             p2/c2/nftClass |    (p3,c3)     |    (p4,c4)     |       p4/c4/p2/c2/nftClass |    C    |
+// |    C    |       p4/c4/p2/c2/nftClass |    (p5,c5)     |    (p6,c6)     | p6/c6/p4/c4/p2/c2/nftClass |    A    |
+// |    A    | p6/c6/p4/c4/p2/c2/nftClass |    (p6,c6)     |    (p5,c5)     |       p4/c4/p2/c2/nftClass |    C    |
+// |    C    |       p4/c4/p2/c2/nftClass |    (p4,c4)     |    (p3,c3)     |             p2/c2/nftClass |    B    |
+// |    B    |             p2/c2/nftClass |    (p2,c2)     |    (p1,c1)     |                   nftClass |    A    |
 //
 func (k Keeper) SendTransfer(
 	ctx sdk.Context,
@@ -125,8 +125,8 @@ func (k Keeper) SendTransfer(
 // back tokens this chain originally transferred to it, the tokens are
 // unescrowed and sent to the receiving address.
 func (k Keeper) OnRecvPacket(ctx sdk.Context, packet channeltypes.Packet,
-	data types.NonFungibleTokenPacketData) error {
-
+	data types.NonFungibleTokenPacketData,
+) error {
 	// validate packet data upon receiving
 	if err := data.ValidateBasic(); err != nil {
 		return err
@@ -279,7 +279,8 @@ func (k Keeper) createOutgoingPacket(ctx sdk.Context,
 // were burnt in the sending chain and will unescrow the token to receiver
 // in the destination chain
 func (k Keeper) processReceivedPacket(ctx sdk.Context, packet channeltypes.Packet,
-	data types.NonFungibleTokenPacketData) error {
+	data types.NonFungibleTokenPacketData,
+) error {
 	receiver, err := sdk.AccAddressFromBech32(data.Receiver)
 	if err != nil {
 		return err

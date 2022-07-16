@@ -22,6 +22,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmprotoversion "github.com/tendermint/tendermint/proto/tendermint/version"
 	tmtypes "github.com/tendermint/tendermint/types"
 	tmversion "github.com/tendermint/tendermint/version"
 
@@ -165,7 +166,7 @@ func NewTestChain(t *testing.T, coord *Coordinator, chainID string) *TestChain {
 
 	for i := 0; i < validatorsPerChain; i++ {
 		privVal := mock.NewPV()
-		pubKey, err := privVal.GetPubKey(context.Background())
+		pubKey, err := privVal.GetPubKey()
 		require.NoError(t, err)
 		validators = append(validators, tmtypes.NewValidator(pubKey, 1))
 		signersByAddress[pubKey.Address().String()] = privVal
@@ -451,7 +452,7 @@ func (chain *TestChain) CreateTMClientHeader(chainID string, blockHeight int64, 
 	nextValHash := nextVals.Hash()
 
 	tmHeader := tmtypes.Header{
-		Version:            tmversion.Consensus{Block: tmversion.BlockProtocol, App: 2},
+		Version:            tmprotoversion.Consensus{Block: tmversion.BlockProtocol, App: 2},
 		ChainID:            chainID,
 		Height:             blockHeight,
 		Time:               timestamp,
