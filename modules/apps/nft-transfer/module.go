@@ -19,11 +19,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer/client/cli"
-	"github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer/keeper"
-	"github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer/simulation"
-	"github.com/cosmos/ibc-go/v3/modules/apps/nft-transfer/types"
-	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
+	"github.com/cosmos/ibc-go/v4/modules/apps/nft-transfer/client/cli"
+	"github.com/cosmos/ibc-go/v4/modules/apps/nft-transfer/keeper"
+	"github.com/cosmos/ibc-go/v4/modules/apps/nft-transfer/simulation"
+	"github.com/cosmos/ibc-go/v4/modules/apps/nft-transfer/types"
+	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 )
 
 var (
