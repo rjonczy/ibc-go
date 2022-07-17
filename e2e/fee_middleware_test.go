@@ -2,12 +2,11 @@ package e2e
 
 import (
 	"context"
+	"e2e/testsuite"
 	"testing"
 
 	"github.com/strangelove-ventures/ibctest/ibc"
 	"github.com/stretchr/testify/suite"
-
-	"e2e/testsuite"
 )
 
 func TestFeeMiddlewareTestSuite(t *testing.T) {

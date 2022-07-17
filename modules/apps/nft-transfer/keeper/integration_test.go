@@ -204,7 +204,7 @@ func (suite *KeeperTestSuite) transferNFT(
 
 	isAwayFromOrigin := types.IsAwayFromOrigin(packet.SourcePort, packet.SourceChannel, data.ClassId)
 
-	//check escrow token
+	// check escrow token
 	if isAwayFromOrigin {
 		suite.Require().Equal(
 			types.GetEscrowAddress(fromEndpoint.ChannelConfig.PortID, fromEndpoint.ChannelID),
@@ -218,14 +218,12 @@ func (suite *KeeperTestSuite) transferNFT(
 		)
 	}
 	return packet
-
 }
 
 func (suite *KeeperTestSuite) receiverNFT(
 	fromEndpoint, toEndpoint *ibctesting.Endpoint,
 	packet channeltypes.Packet,
 ) string {
-
 	var data types.NonFungibleTokenPacketData
 	err := types.ModuleCdc.UnmarshalJSON(packet.GetData(), &data)
 	suite.Require().NoError(err)
@@ -246,7 +244,7 @@ func (suite *KeeperTestSuite) receiverNFT(
 
 	isAwayFromOrigin := types.IsAwayFromOrigin(packet.SourcePort, packet.SourceChannel, data.ClassId)
 	if isAwayFromOrigin {
-		//construct classTrace
+		// construct classTrace
 		prefixedClassID := types.GetClassPrefix(toEndpoint.ChannelConfig.PortID, toEndpoint.ChannelID) + data.GetClassId()
 		trace := types.ParseClassTrace(prefixedClassID)
 		classID = trace.IBCClassID()

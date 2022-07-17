@@ -2,6 +2,7 @@ package testsuite
 
 import (
 	"context"
+	"e2e/testconfig"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -15,8 +16,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest"
-
-	"e2e/testconfig"
 )
 
 const (
