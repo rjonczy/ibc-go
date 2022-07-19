@@ -10,9 +10,7 @@ import (
 	ibctesting "github.com/cosmos/ibc-go/testing"
 )
 
-var (
-	newChainId = "newChainId-1"
-)
+var newChainId = "newChainId-1"
 
 func (suite *TendermintTestSuite) TestVerifyUpgrade() {
 	var (
