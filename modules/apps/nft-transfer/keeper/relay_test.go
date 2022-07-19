@@ -5,10 +5,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/nft"
 
-	"github.com/cosmos/ibc-go/v4/modules/apps/nft-transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
-	channeltypes "github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
-	ibctesting "github.com/cosmos/ibc-go/v4/testing"
+	"github.com/cosmos/ibc-go/v5/modules/apps/nft-transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
+	channeltypes "github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
+	ibctesting "github.com/cosmos/ibc-go/v5/testing"
 )
 
 func (suite *KeeperTestSuite) TestSendTransfer() {

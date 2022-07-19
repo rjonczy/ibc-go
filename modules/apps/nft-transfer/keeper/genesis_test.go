@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"fmt"
 
-	"github.com/cosmos/ibc-go/v4/modules/apps/nft-transfer/types"
+	"github.com/cosmos/ibc-go/v5/modules/apps/nft-transfer/types"
 )
 
 func (suite *KeeperTestSuite) TestGenesis() {
