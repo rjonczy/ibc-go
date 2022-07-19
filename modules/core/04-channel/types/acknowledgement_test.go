@@ -3,12 +3,13 @@ package types_test
 import (
 	"fmt"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	abcitypes "github.com/tendermint/tendermint/abci/types"
 	tmprotostate "github.com/tendermint/tendermint/proto/tendermint/state"
 	tmstate "github.com/tendermint/tendermint/state"
 
-	"github.com/cosmos/ibc-go/v4/modules/core/04-channel/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	"github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
 )
 
 const (

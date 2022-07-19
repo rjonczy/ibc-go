@@ -6,16 +6,17 @@ import (
 	"testing"
 
 	"cosmossdk.io/math"
+	"github.com/stretchr/testify/require"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/stretchr/testify/require"
 
-	host "github.com/cosmos/ibc-go/v4/modules/core/24-host"
-	"github.com/cosmos/ibc-go/v4/modules/core/simulation"
-	"github.com/cosmos/ibc-go/v4/modules/core/types"
+	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
+	"github.com/cosmos/ibc-go/v5/modules/core/simulation"
+	"github.com/cosmos/ibc-go/v5/modules/core/types"
 )
 
 // TestRandomizedGenState tests the normal scenario of applying RandomizedGenState.

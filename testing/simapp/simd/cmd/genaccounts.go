@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -17,7 +19,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/spf13/cobra"
 )
 
 const (
@@ -65,7 +66,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 				addr, err = info.GetAddress()
 				if err != nil {
-					return err
+					return fmt.Errorf("failed to get address of the record: %w", err)
 				}
 			}
 

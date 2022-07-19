@@ -3,12 +3,13 @@ package cli
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/spf13/cobra"
 
-	"github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
+	"github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
 )
 
 // GetCmdQueryDenomTrace defines the command to query a a denomination trace from a given trace hash or ibc denom.

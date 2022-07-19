@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	ibctesting "github.com/cosmos/ibc-go/v4/testing"
+	ibctesting "github.com/cosmos/ibc-go/v5/testing"
 )
 
 type TypesTestSuite struct {
