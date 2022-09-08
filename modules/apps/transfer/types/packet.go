@@ -51,6 +51,9 @@ func (ftpd FungibleTokenPacketData) ValidateBasic() error {
 	if strings.TrimSpace(ftpd.Receiver) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "receiver address cannot be blank")
 	}
+	if len([]byte(ftpd.Receiver)) > MaximumReceiverLength {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "receiver too long")
+	}
 	return ValidatePrefixedDenom(ftpd.Denom)
 }
 

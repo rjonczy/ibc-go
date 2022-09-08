@@ -15,6 +15,24 @@ const (
 
 // TestFungibleTokenPacketDataValidateBasic tests ValidateBasic for FungibleTokenPacketData
 func TestFungibleTokenPacketDataValidateBasic(t *testing.T) {
+	invalidReceiverAddress := `1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890`
+
 	testCases := []struct {
 		name       string
 		packetData FungibleTokenPacketData
@@ -29,6 +47,7 @@ func TestFungibleTokenPacketDataValidateBasic(t *testing.T) {
 		{"invalid large amount", NewFungibleTokenPacketData(denom, invalidLargeAmount, addr1, addr2), false},
 		{"missing sender address", NewFungibleTokenPacketData(denom, amount, emptyAddr, addr2), false},
 		{"missing recipient address", NewFungibleTokenPacketData(denom, amount, addr1, emptyAddr), false},
+		{"too long receiver address", NewFungibleTokenPacketData(denom, amount, addr1, invalidReceiverAddress), false},
 	}
 
 	for i, tc := range testCases {
