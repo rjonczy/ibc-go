@@ -64,6 +64,24 @@ func TestMsgTransferGetSignBytes(t *testing.T) {
 
 // TestMsgTransferValidation tests ValidateBasic for MsgTransfer
 func TestMsgTransferValidation(t *testing.T) {
+	invalidReceiverAddress := `1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890
+		1234567890`
+
 	testCases := []struct {
 		name    string
 		msg     *MsgTransfer
@@ -83,6 +101,7 @@ func TestMsgTransferValidation(t *testing.T) {
 		{"missing sender address", NewMsgTransfer(validPort, validChannel, coin, emptyAddr, addr2, timeoutHeight, 0), false},
 		{"missing recipient address", NewMsgTransfer(validPort, validChannel, coin, addr1, "", timeoutHeight, 0), false},
 		{"empty coin", NewMsgTransfer(validPort, validChannel, sdk.Coin{}, addr1, addr2, timeoutHeight, 0), false},
+		{"too long receiver address", NewMsgTransfer(validPort, validChannel, coin, addr1, invalidReceiverAddress, timeoutHeight, 0), false},
 	}
 
 	for i, tc := range testCases {
