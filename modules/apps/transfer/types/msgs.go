@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/pkg/errors"
 
 	clienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
 	host "github.com/cosmos/ibc-go/v3/modules/core/24-host"
@@ -13,8 +12,8 @@ import (
 
 // msg types
 const (
-	TypeMsgTransfer = "transfer"
-	MaximumReceiverAddress = 128
+	TypeMsgTransfer       = "transfer"
+	MaximumReceiverLength = 512
 )
 
 // NewMsgTransfer creates a new MsgTransfer instance
@@ -57,9 +56,6 @@ func (msg MsgTransfer) ValidateBasic() error {
 	if err := host.ChannelIdentifierValidator(msg.SourceChannel); err != nil {
 		return sdkerrors.Wrap(err, "invalid source channel ID")
 	}
-	if len(msg.Receiver) > MaximumReceiverAddress {
-		return errors.Errorf("receiver addresss exceeds maximum length")
-	}
 	if !msg.Token.IsValid() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Token.String())
 	}
@@ -73,6 +69,9 @@ func (msg MsgTransfer) ValidateBasic() error {
 	}
 	if strings.TrimSpace(msg.Receiver) == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "missing recipient address")
+	}
+	if len([]byte(msg.Receiver)) > MaximumReceiverLength {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "receiver too long")
 	}
 	return ValidateIBCDenom(msg.Token.Denom)
 }
