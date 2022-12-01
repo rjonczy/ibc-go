@@ -5,12 +5,12 @@ package tendermint
 
 import (
 	fmt "fmt"
-	_go "github.com/confio/ics23/go"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
 	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
 	types "github.com/cosmos/ibc-go/v6/modules/core/02-client/types"
 	types1 "github.com/cosmos/ibc-go/v6/modules/core/23-commitment/types"
+	_go "github.com/cosmos/ics23/go"
 	github_com_tendermint_tendermint_libs_bytes "github.com/tendermint/tendermint/libs/bytes"
 	types2 "github.com/tendermint/tendermint/proto/tendermint/types"
 	_ "google.golang.org/protobuf/types/known/durationpb"
