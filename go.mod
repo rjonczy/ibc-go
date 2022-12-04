@@ -165,6 +165,3 @@ require (
 	pgregory.net/rapid v0.5.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
-
-// 	// dragonberry replace for ics23
-// replace github.com/confio/ics23/go => github.com/cosmos/ics23/go v0.9.1-0.20221130183932-a21f34155281
