@@ -44,7 +44,7 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 }
 
 // ModuleAccountAddrs returns all the app's module account addresses.
-func (app *SimApp) ModuleAccountAddrs() map[string]bool {
+func ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		// do not add the following modules to blocked addresses
