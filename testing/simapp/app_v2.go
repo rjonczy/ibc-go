@@ -176,6 +176,9 @@ type SimApp struct {
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
 
+	// the module manager
+	ModuleManager *module.Manager
+
 	// simulation manager
 	sm *module.SimulationManager
 }

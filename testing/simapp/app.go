@@ -706,8 +706,6 @@ func (app *SimApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height)
 }
 
-
-
 // GetModuleManager returns the app module manager
 // NOTE: used for testing purposes
 func (app *SimApp) GetModuleManager() *module.Manager {

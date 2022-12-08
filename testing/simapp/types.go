@@ -35,9 +35,6 @@ type App interface {
 		forZeroHeight bool, jailAllowedAddrs []string, modulesToExport []string,
 	) (types.ExportedApp, error)
 
-	// All the registered module account addreses.
-	ModuleAccountAddrs() map[string]bool
-
 	// Helper for the simulation framework.
 	SimulationManager() *module.SimulationManager
 }
