@@ -23,14 +23,13 @@ import (
 var _ QueryServer = (*Keeper)(nil)
 
 type Keeper struct {
-	storeKey storetypes.StoreKey
-	cdc      codec.BinaryCodec
-	wasmVM   *cosmwasm.VM
+	storeKey  storetypes.StoreKey
+	cdc       codec.BinaryCodec
+	wasmVM    *cosmwasm.VM
 	authority string
 }
 
 func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey) Keeper {
-
 	// Wasm VM
 	wasmDataDir := "wasm_client_data"
 	wasmSupportedFeatures := strings.Join([]string{"storage", "iterator"}, ",")
@@ -48,9 +47,9 @@ func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey) Keeper {
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
 	return Keeper{
-		cdc:      cdc,
-		storeKey: key,
-		wasmVM:   vm,
+		cdc:       cdc,
+		storeKey:  key,
+		wasmVM:    vm,
 		authority: authority.String(),
 	}
 }
@@ -73,7 +72,7 @@ func (k Keeper) PushNewWasmCode(ctx sdk.Context, code []byte) ([]byte, error) {
 	}
 
 	// create the code in the vm
-	codeID, err := WasmVM.Create(code)
+	codeID, err := WasmVM.StoreCode(code)
 	if err != nil {
 		return nil, ErrWasmInvalidCode
 	}

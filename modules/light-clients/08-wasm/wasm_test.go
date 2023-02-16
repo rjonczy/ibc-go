@@ -32,7 +32,7 @@ type WasmTestSuite struct {
 	store          sdk.KVStore
 	clientState    wasm.ClientState
 	consensusState wasm.ConsensusState
-	codeId         []byte
+	codeID         []byte
 	testData       map[string]string
 	wasmKeeper     wasm.Keeper
 }
@@ -62,12 +62,14 @@ func (suite *WasmTestSuite) SetupTest() {
 	suite.ctx = app.BaseApp.NewContext(checkTx, tmproto.Header{Height: 1, Time: suite.now}).WithGasMeter(sdk.NewInfiniteGasMeter())
 	suite.store = suite.chainA.App.GetIBCKeeper().ClientKeeper.ClientStore(suite.chainA.GetContext(), exported.Wasm)
 
-	os.MkdirAll("tmp", 0o755)
+	err = os.MkdirAll("tmp", 0o755)
+	suite.Require().NoError(err)
+
 	suite.wasmKeeper = app.IBCKeeper.WasmClientKeeper
 	data, err = os.ReadFile("test_data/ics10_grandpa_cw.wasm")
 	suite.Require().NoError(err)
 
-	codeId, err := suite.wasmKeeper.PushNewWasmCode(suite.ctx, data)
+	codeID, err := suite.wasmKeeper.PushNewWasmCode(suite.ctx, data)
 	suite.Require().NoError(err)
 
 	data, err = hex.DecodeString(suite.testData["client_state_a0"])
@@ -75,7 +77,7 @@ func (suite *WasmTestSuite) SetupTest() {
 
 	clientState := wasm.ClientState{
 		Data:   data,
-		CodeId: codeId,
+		CodeId: codeID,
 		LatestHeight: clienttypes.Height{
 			RevisionNumber: 1,
 			RevisionHeight: 2,
@@ -94,7 +96,7 @@ func (suite *WasmTestSuite) SetupTest() {
 		},
 	}
 	suite.consensusState = consensusState
-	suite.codeId = clientState.CodeId
+	suite.codeID = clientState.CodeId
 }
 
 // // Panics
@@ -318,7 +320,7 @@ func (suite *WasmTestSuite) TestUpdateState() {
 	}
 }
 
-// TODO: uncomment when test data is aquired
+// TODO: uncomment when test data is acquired
 /*
 func (suite *WasmTestSuite) TestVerifyNonMemership() {
 	var (
@@ -426,7 +428,7 @@ func (suite *WasmTestSuite) TestVerifyMisbehaviour() {
 }
 */
 
-// TODO: uncomment when test data is aquired
+// TODO: uncomment when test data is acquired
 /*
 func (suite *WasmTestSuite) TestVerifyMemership() {
 	var (

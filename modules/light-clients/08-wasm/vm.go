@@ -12,8 +12,10 @@ import (
 
 // TODO: figure out better handling for the gas settings. ideally these should be in the
 // 28-wasm module and handled as params
-const GasMultiplier uint64 = 100
-const maxGasLimit = uint64(0x7FFFFFFFFFFFFFFF)
+const (
+	GasMultiplier uint64 = 100
+	maxGasLimit          = uint64(0x7FFFFFFFFFFFFFFF)
+)
 
 var WasmVM *cosmwasm.VM
 
@@ -160,9 +162,7 @@ func callContractWithEnvAndMeter(codeID cosmwasm.Checksum, ctx sdk.Context, stor
 	// mockQuerier := api.MockQuerier{}
 	desercost := types.UFraction{Numerator: 1, Denominator: 1}
 	resp, gasUsed, err := WasmVM.Execute(codeID, env, msgInfo, msg, store, cosmwasm.GoAPI{}, nil, gasMeter, gasMeter.Limit(), desercost)
-	if &ctx != nil {
-		consumeGas(ctx, gasUsed)
-	}
+	consumeGas(ctx, gasUsed) // NOTE: changed due to linter feedback and unsure if this resolves - got - // modules/light-clients/08-wasm/vm.go:165:5: SA4022: the address of a variable cannot be nil (staticcheck), so made this unconditional
 	return resp, err
 }
 

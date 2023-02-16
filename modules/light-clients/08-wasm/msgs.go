@@ -5,9 +5,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var (
-	_ sdk.Msg = &MsgPushNewWasmCode{}
-)
+var _ sdk.Msg = &MsgPushNewWasmCode{}
 
 func (m MsgPushNewWasmCode) ValidateBasic() error {
 	if len(m.Code) == 0 {
@@ -19,7 +17,6 @@ func (m MsgPushNewWasmCode) ValidateBasic() error {
 	return nil
 }
 
-
 func (m MsgPushNewWasmCode) GetSigners() []sdk.AccAddress {
 	signer, err := sdk.AccAddressFromBech32(m.Signer)
 	if err != nil {
@@ -27,4 +24,3 @@ func (m MsgPushNewWasmCode) GetSigners() []sdk.AccAddress {
 	}
 	return []sdk.AccAddress{signer}
 }
-

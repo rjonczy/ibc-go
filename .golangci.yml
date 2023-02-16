@@ -29,7 +29,13 @@ linters:
 
 issues:
   exclude-rules:
-    - text: "SA1019:"
+    - text: "sdkerrors.ABCIInfo"  
+      linters:
+        - staticcheck
+    - text: "sdkerrors.Register"
+      linters:
+        - staticcheck
+    - text: "sdkerrors.Wrap"
       linters:
         - staticcheck
     - text: "Use of weak random number generator"

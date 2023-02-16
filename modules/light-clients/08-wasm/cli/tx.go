@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -24,7 +24,7 @@ func NewPushNewWasmCodeCmd() *cobra.Command {
 
 			fileName := args[0]
 
-			code, err := ioutil.ReadFile(fileName)
+			code, err := os.ReadFile(fileName)
 			if err != nil {
 				return err
 			}

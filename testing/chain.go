@@ -401,10 +401,10 @@ func (chain *TestChain) ConstructUpdateTMClientHeader(counterparty *TestChain, c
 
 func (chain *TestChain) ConstructUpdateWasmClientHeaderWithTrustedHeight(counterparty *TestChain, clientID string, trustedHeight clienttypes.Height) (*wasm.Header, error) {
 	// header := counterparty.LastHeader
-	if trustedHeight.IsZero() {
-		trustedHeight = chain.GetClientState(clientID).GetLatestHeight().(clienttypes.Height)
-	}
-	panic("not implemented")
+	// if trustedHeight.IsZero() {
+	// 		trustedHeight = chain.GetClientState(clientID).GetLatestHeight().(clienttypes.Height)
+	//	}
+	//	panic("not implemented")
 	return nil, nil
 }
 

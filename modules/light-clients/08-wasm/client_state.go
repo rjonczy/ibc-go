@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
@@ -342,7 +341,7 @@ func NewClientState(latestSequence uint64, consensusState *ConsensusState) *Clie
 }
 
 // / Calls the contract with the given payload and writes the result to `output`
-func call[T ContractResult](payload any, c *ClientState, ctx sdk.Context, clientStore types.KVStore) (T, error) {
+func call[T ContractResult](payload any, c *ClientState, ctx sdk.Context, clientStore sdk.KVStore) (T, error) {
 	var output T
 	encodedData, err := json.Marshal(payload)
 	if err != nil {
