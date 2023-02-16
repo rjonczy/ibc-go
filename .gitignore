@@ -7,10 +7,6 @@
 *.swn
 *.pyc
 
-# private files
-private[.-]*
-private
-
 # Build
 vendor
 build
@@ -57,4 +53,3 @@ dependency-graph.png
 *.history
 
 tmp/
-*.wasm
