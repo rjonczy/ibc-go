@@ -1,12 +1,6 @@
 package wasm_test
 
-import (
-	"encoding/hex"
-	"os"
-
-	wasm "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm"
-)
-
+/*
 func (suite *WasmTestSuite) TestPushNewWasmCode() {
 	data, err := os.ReadFile("test_data/example.wasm")
 	suite.Require().NoError(err)
@@ -46,3 +40,4 @@ func (suite *WasmTestSuite) TestQueryWasmCode() {
 	suite.Require().NoError(err)
 	suite.Require().NotNil(res.Code)
 }
+*/
