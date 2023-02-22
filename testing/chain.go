@@ -405,7 +405,7 @@ func (chain *TestChain) ConstructUpdateWasmClientHeaderWithTrustedHeight(counter
 		trustedHeight = chain.GetClientState(clientID).GetLatestHeight().(clienttypes.Height)
 	}
 	panic("not implemented")
-	return nil, nil
+	// return nil, nil
 }
 
 // ConstructUpdateTMClientHeader will construct a valid 07-tendermint Header to update the

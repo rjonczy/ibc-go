@@ -7,7 +7,7 @@ import (
 )
 
 func HandleMsgPushNewWasmCode(ctx sdk.Context, k Keeper, msg *MsgPushNewWasmCode) (*MsgPushNewWasmCodeResponse, error) {
-	if (k.authority != msg.Signer) {
+	if k.authority != msg.Signer {
 		return nil, sdkerrors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority: expected %s, got %s", k.authority, msg.Signer)
 	}
 
