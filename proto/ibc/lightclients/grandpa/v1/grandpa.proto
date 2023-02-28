@@ -1,0 +1,80 @@
+
+syntax = "proto3";
+package ibc.lightclients.grandpa.v1;
+
+import "gogoproto/gogo.proto";
+import "ibc/core/client/v1/client.proto";
+import "ibc/core/commitment/v1/commitment.proto";
+
+option go_package = "github.com/cosmos/ibc-go/v7/modules/light-clients/10-grandpa;grandpa";
+
+// Grandpa light client's Client state
+message ClientState {
+  option (gogoproto.goproto_getters)      = false;
+  uint64 latest_height = 1 [(gogoproto.moretags) = "yaml:\"latest_height\""];
+  uint64 frozen_height = 2 [(gogoproto.moretags) = "yaml:\"latest_height\""];
+}
+
+// Grandpa light client's ConsensusState
+message ConsensusState {
+  option (gogoproto.goproto_getters) = false;
+  bytes data                         = 1;
+  bytes code_id                      = 2;
+
+  // timestamp that corresponds to the block height in which the ConsensusState
+  // was stored.
+  uint64 timestamp = 3;
+  // commitment root
+  ibc.core.commitment.v1.MerkleRoot root = 4;
+} //
+
+
+// Grandpa light client Header
+message Header {
+  uint64 height = 1;
+  ibc.core.commitment.v1.MerkleRoot root                 = 2 [(gogoproto.nullable) = false];
+  Justification justification = 3;
+
+}
+
+// Grandpa light client Misbehaviour
+message Misbehaviour {
+  option (gogoproto.goproto_getters) = false;
+}
+
+// A GRANDPA justification for block finality, it includes a commit message and an ancestry proof including all headers routing all 
+// precommit target blocksto the commit target block. For example, the latest blocks are A - B - C - D - E - F, where A is the last finalised block, 
+// F is the point where a majority for vote (they may on B, C, D, E, F) can be collected.  Then the proof need to include all headers from F back to A
+message Justification {
+  uint64 round = 1;
+  Commit commit = 2;
+  repeated Header votes_ancestries =3;
+}
+
+// A commit message which is an aggregate of signed precommits.
+message Commit {
+  repeated SignedPrecommit precommits = 1;
+}
+
+// GRANDPA precommits
+message SignedPrecommit {
+  option (gogoproto.goproto_getters) = false;
+
+  bytes hash = 1;
+  bytes signature = 2;
+  uint64 authority_id = 3 ; 
+}
+
+// A set of authorities for GRANDPA.
+message AuthoritySet {
+  option (gogoproto.goproto_getters) = false;
+
+  uint64 set_id = 1;
+  repeated Authority authorities = 2;
+}
+
+// Authority for GRANDPA.
+message Authority {
+  uint64 authority_id = 1;
+  uint64 authority_weight = 2;
+}
