@@ -6,7 +6,7 @@ require (
 	cosmossdk.io/api v0.3.1
 	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/math v1.0.0-beta.6
-	cosmossdk.io/simapp v0.0.0-20221216140705-ee8890cf30e7
+	cosmossdk.io/simapp v0.0.0-20230302094501-e598472a2b32
 	cosmossdk.io/tools/rosetta v0.2.1
 	github.com/CosmWasm/wasmvm v1.2.0
 	github.com/armon/go-metrics v0.4.1
@@ -14,7 +14,7 @@ require (
 	github.com/cometbft/cometbft-db v0.7.0
 	github.com/confio/ics23/go v0.9.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.2
-	github.com/cosmos/cosmos-sdk v0.47.0-rc3
+	github.com/cosmos/cosmos-sdk v0.47.0
 	github.com/cosmos/gogoproto v1.4.6
 	github.com/cosmos/ics23/go v0.9.1-0.20221207100636-b1abd8678aab
 	github.com/golang/protobuf v1.5.2
@@ -37,7 +37,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.12.0 // indirect
 	cloud.google.com/go/storage v1.29.0 // indirect
-	cosmossdk.io/core v0.3.2 // indirect
+	cosmossdk.io/core v0.5.1 // indirect
 	cosmossdk.io/depinject v1.0.0-alpha.3 // indirect
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
@@ -140,7 +140,6 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
-	github.com/tendermint/tendermint v0.37.0-rc2 // indirect
 	github.com/tendermint/tm-db v0.6.7 // indirect
 	github.com/tidwall/btree v1.6.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
@@ -164,3 +163,5 @@ require (
 	pgregory.net/rapid v0.5.5 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+replace github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.47.0-rc3
