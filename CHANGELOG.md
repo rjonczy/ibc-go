@@ -59,6 +59,8 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * (07-tendermint) [\#1896](https://github.com/cosmos/ibc-go/pull/1896) Remove error return from `IterateConsensusStateAscending` in `07-tendermint`.
 * (apps/27-interchain-accounts) [\#2638](https://github.com/cosmos/ibc-go/pull/2638) Interchain accounts host and controller Keepers now expects a keeper which fulfills the expected `exported.ScopedKeeper` interface for the capability keeper.
 * (06-solomachine) [\#2761](https://github.com/cosmos/ibc-go/pull/2761) Removed deprecated `ClientId` field from `Misbehaviour` and `allow_update_after_proposal` field from `ClientState`.
+* (apps) [\#3154](https://github.com/cosmos/ibc-go/pull/3154)  Remove unused `ProposalContents` function.
+* (apps) [#3149](https://github.com/cosmos/ibc-go/pull/3149) Remove legacy interface function `RandomizedParams`, which is no longer used.
 
 ### State Machine Breaking
 
@@ -68,6 +70,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 
 ### Improvements
 
+* (core) [\#3082](https://github.com/cosmos/ibc-go/pull/3082) Add `HasConnection` and `HasChannel` methods.
 * (tests) [\#2926](https://github.com/cosmos/ibc-go/pull/2926) Lint tests
 * (apps/transfer) [\#2643](https://github.com/cosmos/ibc-go/pull/2643) Add amount, denom, and memo to transfer event emission.
 * (core) [\#2746](https://github.com/cosmos/ibc-go/pull/2746) Allow proof height to be zero for all core IBC `sdk.Msg` types that contain proofs.
@@ -92,6 +95,7 @@ Ref: https://keepachangelog.com/en/1.0.0/
 * [\#2434](https://github.com/cosmos/ibc-go/pull/2478) Removed all `TypeMsg` constants
 * (modules/core/exported) [#1689] (https://github.com/cosmos/ibc-go/pull/2539) Removing `GetVersions` from `ConnectionI` interface.
 * (core/02-connection) [#2419](https://github.com/cosmos/ibc-go/pull/2419) Add optional proof data to proto definitions of `MsgConnectionOpenTry` and `MsgConnectionOpenAck` for host state machines that are unable to introspect their own consensus state.
+* (modules/light-clients/07-tendermint) [#2007](https://github.com/cosmos/ibc-go/pull/3046) Moved non-verification misbehaviour checks to `CheckForMisbehaviour`
 
 ### Features
 
