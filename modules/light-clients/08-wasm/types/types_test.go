@@ -12,18 +12,18 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	dbm "github.com/cometbft/cometbft-db"
+	tmjson "github.com/cometbft/cometbft/libs/json"
+	"github.com/cometbft/cometbft/libs/log"
+	tmtypes "github.com/cometbft/cometbft/types"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
+	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
 	"github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/keeper"
 	wasmtypes "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 	ibctesting "github.com/cosmos/ibc-go/v7/testing"
 	"github.com/cosmos/ibc-go/v7/testing/simapp"
 	"github.com/stretchr/testify/suite"
-	tmjson "github.com/tendermint/tendermint/libs/json"
-	"github.com/tendermint/tendermint/libs/log"
-	tmtypes "github.com/tendermint/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 )
 
 type WasmTestSuite struct {
@@ -42,6 +42,7 @@ type WasmTestSuite struct {
 	testData       map[string]string
 	wasmKeeper     keeper.Keeper
 }
+
 func SetupTestingWithChannel() (ibctesting.TestingApp, map[string]json.RawMessage) {
 	db := dbm.NewMemDB()
 	encCdc := simapp.MakeTestEncodingConfig()
@@ -75,7 +76,7 @@ func SetupTestingWithChannel() (ibctesting.TestingApp, map[string]json.RawMessag
 
 func (suite *WasmTestSuite) SetupWithChannel() {
 	ibctesting.DefaultTestingAppInit = SetupTestingWithChannel
-    suite.SetupTest()
+	suite.SetupTest()
 	clientState, ok := suite.chainA.App.GetIBCKeeper().ClientKeeper.GetClientState(suite.ctx, "08-wasm-0")
 	if ok {
 		suite.clientState = clientState
@@ -102,7 +103,7 @@ func (suite *WasmTestSuite) SetupTest() {
 	suite.Require().NoError(err)
 	err = json.Unmarshal(createClientData, &suite.testData)
 	suite.Require().NoError(err)
-	
+
 	suite.ctx = suite.chainA.GetContext().WithGasMeter(sdk.NewInfiniteGasMeter())
 	suite.store = suite.chainA.App.GetIBCKeeper().ClientKeeper.ClientStore(suite.ctx, "08-wasm-0")
 

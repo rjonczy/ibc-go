@@ -12,7 +12,7 @@ require (
 	github.com/gogo/protobuf v1.3.3
 	github.com/strangelove-ventures/ibctest/v6 v6.0.0-20221005154709-b642157674bc
 	github.com/stretchr/testify v1.8.1
-	github.com/tendermint/tendermint v0.34.23
+	github.com/cometbft/cometbft v0.34.23
 	go.uber.org/zap v1.23.0
 	golang.org/x/mod v0.6.0
 	google.golang.org/grpc v1.51.0
@@ -165,7 +165,7 @@ require (
 	github.com/tendermint/btcd v0.1.1 // indirect
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15 // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
-	github.com/tendermint/tm-db v0.6.7 // indirect
+	github.com/cometbft/cometbft-db v0.6.7 // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/vedhavyas/go-subkey v1.0.3 // indirect
 	github.com/zondax/hid v0.9.1-0.20220302062450-5552068d2266 // indirect

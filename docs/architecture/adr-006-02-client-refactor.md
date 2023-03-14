@@ -44,7 +44,7 @@ Here are some examples of issues which arose for light clients that are not appl
 
 ### Tendermint non-zero height upgrades
 
-Before the launch of IBC, it was determined that the golang implementation of [tendermint](https://github.com/tendermint/tendermint) would not be capable of supporting non-zero height upgrades.
+Before the launch of IBC, it was determined that the golang implementation of [tendermint](https://github.com/cometbft/cometbft) would not be capable of supporting non-zero height upgrades.
 This implies that any upgrade would require changing of the chain ID and resetting the height to 0. 
 A chain is uniquely identified by its chain-id and validator set. 
 Two different chain ID's can be viewed as different chains and thus a normal update produced by a validator set cannot change the chain ID. 

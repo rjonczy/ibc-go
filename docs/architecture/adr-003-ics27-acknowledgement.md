@@ -18,7 +18,7 @@ Only determinstic information returned from the message execution is allowed to 
 
 ## Decision
 
-At the time of this writing, Tendermint includes the following information in the [ABCI.ResponseDeliverTx](https://github.com/tendermint/tendermint/blob/release/v0.34.13/types/results.go#L47-#L53):
+At the time of this writing, Tendermint includes the following information in the [ABCI.ResponseDeliverTx](https://github.com/cometbft/cometbft/blob/release/v0.34.13/types/results.go#L47-#L53):
 ```go
 // deterministicResponseDeliverTx strips non-deterministic fields from
 // ResponseDeliverTx and returns another ResponseDeliverTx.

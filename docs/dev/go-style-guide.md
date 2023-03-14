@@ -79,7 +79,7 @@ Perhaps more key for code readability than good commenting is having the right s
 					
 		// external library imports
 		"github.com/stretchr/testify/require"
-		abci "github.com/tendermint/tendermint/abci/types"
+		abci "github.com/cometbft/cometbft/abci/types"
 					
 		// ibc-go library imports
 		"github.com/cosmos/ibc-go/modules/core/23-commitment/types"
