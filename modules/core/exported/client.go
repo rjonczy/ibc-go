@@ -25,6 +25,9 @@ const (
 	// LocalhostClientID is the sentinel client ID for the localhost client.
 	LocalhostClientID string = Localhost
 
+	// Wasm is used to indicate that the light client is a on-chain wasm program
+	Wasm string = "08-wasm"
+
 	// Active is a status type of a client. An active client is allowed to be used.
 	Active Status = "Active"
 

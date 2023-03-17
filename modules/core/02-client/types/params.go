@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	// DefaultAllowedClients are the default clients for the AllowedClients parameter.
-	DefaultAllowedClients = []string{exported.Solomachine, exported.Tendermint, exported.Localhost}
+
+	// DefaultAllowedClients are "06-solomachine" and "07-tendermint"
+	DefaultAllowedClients = []string{exported.Solomachine, exported.Tendermint, exported.Localhost, exported.Wasm}
 
 	// KeyAllowedClients is store's key for AllowedClients Params
 	KeyAllowedClients = []byte("AllowedClients")
@@ -36,7 +37,10 @@ func DefaultParams() Params {
 
 // Validate all ibc-client module parameters
 func (p Params) Validate() error {
-	return validateClients(p.AllowedClients)
+	if err := validateClients(p.AllowedClients); err != nil {
+		return err
+	}
+	return nil
 }
 
 // ParamSetPairs implements params.ParamSet
