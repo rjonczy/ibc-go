@@ -1,7 +1,8 @@
-<!-- This file is auto-generated. Please do not modify it yourself. -->
-# Protobuf Documentation
-<a name="top"></a>
+<!--
+order: 7
+-->
 
+<<<<<<< HEAD
 ## Table of Contents
 
 - [ibc/applications/fee/v1/ack.proto](#ibc/applications/fee/v1/ack.proto)
@@ -5633,4 +5634,8 @@ Wasm light client Misbehaviour
 | <a name="bool" /> bool |  | bool | boolean | boolean | bool | bool | boolean | TrueClass/FalseClass |
 | <a name="string" /> string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String | str/unicode | string | string | string | String (UTF-8) |
 | <a name="bytes" /> bytes | May contain any arbitrary sequence of bytes. | string | ByteString | str | []byte | ByteString | string | String (ASCII-8BIT) |
+=======
+# Protobuf documentation
+>>>>>>> upstream/release/v7.1.x
 
+See [ibc-go Buf Protobuf documentation](https://buf.build/cosmos/ibc/tags/main).
