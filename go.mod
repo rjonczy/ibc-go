@@ -1,8 +1,6 @@
-go 1.18
+go 1.19
 
 module github.com/cosmos/ibc-go/v6
-
-retract v6.0.0 // depends on SDK version < v0.46.7
 
 require (
 	cosmossdk.io/math v1.0.0-beta.3
