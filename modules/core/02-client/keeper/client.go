@@ -57,9 +57,9 @@ func (k Keeper) UpdateClient(ctx sdk.Context, clientID string, clientMsg exporte
 
 	clientStore := k.ClientStore(ctx, clientID)
 
-	if status := k.GetClientStatus(ctx, clientState, clientID); status != exported.Active {
-		return sdkerrors.Wrapf(types.ErrClientNotActive, "cannot update client (%s) with status %s", clientID, status)
-	}
+	// if status := k.GetClientStatus(ctx, clientState, clientID); status != exported.Active {
+	// 	return sdkerrors.Wrapf(types.ErrClientNotActive, "cannot update client (%s) with status %s", clientID, status)
+	// }
 
 	if err := clientState.VerifyClientMessage(ctx, k.cdc, clientStore, clientMsg); err != nil {
 		return err

@@ -48,8 +48,9 @@ func (c ClientState) Status(ctx sdk.Context, store sdk.KVStore, cdc codec.Binary
 	if err != nil {
 		return status
 	}
-
+	text, err := call[contractResult](payload, &c, ctx, store)
 	response, err := queryContractWithStore(c.CodeId, ctx, store, encodedData)
+	fmt.Println("==========text===========================", text)
 	if err != nil {
 		return status
 	}
