@@ -15,7 +15,6 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 
 	"github.com/cosmos/ibc-go/v7/modules/core/02-client/keeper"
@@ -86,7 +85,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(suite.T(), isCheckTx)
 
 	suite.cdc = app.AppCodec()
-	suite.ctx = app.BaseApp.NewContext(isCheckTx, tmproto.Header{Height: height, ChainID: testClientID, Time: now2})
+	suite.ctx = app.BaseApp.NewContext(isCheckTx)
 	suite.keeper = &app.IBCKeeper.ClientKeeper
 	suite.privVal = ibctestingmock.NewPV()
 	pubKey, err := suite.privVal.GetPubKey()
@@ -109,7 +108,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 		privVal := ibctestingmock.NewPV()
 		tmPk, err := privVal.GetPubKey()
 		suite.Require().NoError(err)
-		pk, err := cryptocodec.FromTmPubKeyInterface(tmPk)
+		pk, err := cryptocodec.FromCmtPubKeyInterface(tmPk)
 		suite.Require().NoError(err)
 		val, err := stakingtypes.NewValidator(sdk.ValAddress(pk.Address()), pk, stakingtypes.Description{})
 		suite.Require().NoError(err)
@@ -119,7 +118,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 		validators = append(validators, val)
 
 		hi := stakingtypes.NewHistoricalInfo(suite.ctx.BlockHeader(), validators, sdk.DefaultPowerReduction)
-		app.StakingKeeper.SetHistoricalInfo(suite.ctx, int64(i), &hi)
+		err = app.StakingKeeper.SetHistoricalInfo(suite.ctx, int64(i), &hi)
+		suite.Require().NoError(err)
 	}
 
 	suite.solomachine = ibctesting.NewSolomachine(suite.T(), suite.chainA.Codec, "solomachinesingle", "testing", 1)
@@ -229,7 +229,7 @@ func (suite *KeeperTestSuite) TestValidateSelfClient() {
 	}
 }
 
-func (suite KeeperTestSuite) TestGetAllGenesisClients() { //nolint:govet // this is a test, we are okay with copying locks
+func (suite KeeperTestSuite) TestGetAllGenesisClients() { //nolint:govet,copylocks // this is a test, we are okay with copying locks
 	clientIDs := []string{
 		exported.LocalhostClientID, testClientID2, testClientID3, testClientID,
 	}

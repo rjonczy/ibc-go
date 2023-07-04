@@ -5,26 +5,27 @@ import (
 	"testing"
 	"time"
 
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/require"
 
+	"cosmossdk.io/log"
 	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
-	"github.com/cometbft/cometbft/libs/log"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
@@ -36,7 +37,10 @@ import (
 var DefaultTestingAppInit = SetupTestingApp
 
 type TestingApp interface {
-	abci.Application
+	servertypes.ABCI
+	GetContextForFinalizeBlock(txBytes []byte) sdk.Context
+	NewContextLegacy(isCheckTx bool, header cmtproto.Header) sdk.Context
+	NewUncachedContext(isCheckTx bool, header cmtproto.Header) sdk.Context
 
 	// ibc-go additions
 	GetBaseApp() *baseapp.BaseApp
@@ -55,9 +59,8 @@ type TestingApp interface {
 
 func SetupTestingApp() (TestingApp, map[string]json.RawMessage) {
 	db := dbm.NewMemDB()
-	encCdc := simapp.MakeTestEncodingConfig()
 	app := simapp.NewSimApp(log.NewNopLogger(), db, nil, true, simtestutil.EmptyAppOptions{})
-	return app, simapp.NewDefaultGenesisState(encCdc.Codec)
+	return app, simapp.NewDefaultGenesisState(app.AppCodec())
 }
 
 // SetupWithGenesisValSet initializes a new SimApp with a validator set and genesis accounts
@@ -81,7 +84,7 @@ func SetupWithGenesisValSet(tb testing.TB, valSet *tmtypes.ValidatorSet, genAccs
 	bondAmt := sdk.TokensFromConsensusPower(1, powerReduction)
 
 	for _, val := range valSet.Validators {
-		pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
+		pk, err := cryptocodec.FromCmtPubKeyInterface(val.PubKey)
 		require.NoError(tb, err)
 		pkAny, err := codectypes.NewAnyWithValue(pk)
 		require.NoError(tb, err)
@@ -127,27 +130,22 @@ func SetupWithGenesisValSet(tb testing.TB, valSet *tmtypes.ValidatorSet, genAccs
 	require.NoError(tb, err)
 
 	// init chain will set the validator set and initialize the genesis accounts
-	app.InitChain(
-		abci.RequestInitChain{
-			ChainId:       chainID,
-			Validators:    []abci.ValidatorUpdate{},
-			AppStateBytes: stateBytes,
+	_, err = app.InitChain(
+		&abci.RequestInitChain{
+			ChainId:         chainID,
+			Validators:      []abci.ValidatorUpdate{},
+			AppStateBytes:   stateBytes,
+			ConsensusParams: simtestutil.DefaultConsensusParams,
 		},
 	)
+	require.NoError(tb, err)
 
-	// commit genesis changes
-	app.Commit()
-	app.BeginBlock(
-		abci.RequestBeginBlock{
-			Header: tmproto.Header{
-				ChainID:            chainID,
-				Height:             app.LastBlockHeight() + 1,
-				AppHash:            app.LastCommitID().Hash,
-				ValidatorsHash:     valSet.Hash(),
-				NextValidatorsHash: valSet.Hash(),
-			},
-		},
-	)
+	_, err = app.FinalizeBlock(&abci.RequestFinalizeBlock{
+		Height:             app.LastBlockHeight() + 1,
+		Hash:               app.LastCommitID().Hash,
+		NextValidatorsHash: valSet.Hash(),
+	})
+	require.NoError(tb, err)
 
 	return app
 }

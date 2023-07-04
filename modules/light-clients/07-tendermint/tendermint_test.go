@@ -10,7 +10,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	tmbytes "github.com/cometbft/cometbft/libs/bytes"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtypes "github.com/cometbft/cometbft/types"
 
 	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
@@ -92,23 +91,11 @@ func (suite *TendermintTestSuite) SetupTest() {
 	suite.valSet = tmtypes.NewValidatorSet([]*tmtypes.Validator{val})
 	suite.valsHash = suite.valSet.Hash()
 	suite.header = suite.chainA.CreateTMClientHeader(chainID, int64(height.RevisionHeight), heightMinus1, suite.now, suite.valSet, suite.valSet, suite.valSet, suite.signers)
-	suite.ctx = app.BaseApp.NewContext(checkTx, tmproto.Header{Height: 1, Time: suite.now})
+	suite.ctx = app.BaseApp.NewContext(checkTx)
 }
 
 func getAltSigners(altVal *tmtypes.Validator, altPrivVal tmtypes.PrivValidator) map[string]tmtypes.PrivValidator {
 	return map[string]tmtypes.PrivValidator{altVal.Address.String(): altPrivVal}
-}
-
-func getBothSigners(suite *TendermintTestSuite, altVal *tmtypes.Validator, altPrivVal tmtypes.PrivValidator) (*tmtypes.ValidatorSet, map[string]tmtypes.PrivValidator) {
-	// Create bothValSet with both suite validator and altVal. Would be valid update
-	bothValSet := tmtypes.NewValidatorSet(append(suite.valSet.Validators, altVal))
-	// Create signer array and ensure it is in same order as bothValSet
-	_, suiteVal := suite.valSet.GetByIndex(0)
-	bothSigners := map[string]tmtypes.PrivValidator{
-		suiteVal.Address.String(): suite.privVal,
-		altVal.Address.String():   altPrivVal,
-	}
-	return bothValSet, bothSigners
 }
 
 func TestTendermintTestSuite(t *testing.T) {

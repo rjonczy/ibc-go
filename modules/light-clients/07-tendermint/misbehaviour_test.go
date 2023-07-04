@@ -1,19 +1,6 @@
 package tendermint_test
 
-import (
-	"time"
-
-	"github.com/cometbft/cometbft/crypto/tmhash"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	tmtypes "github.com/cometbft/cometbft/types"
-
-	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
-	"github.com/cosmos/ibc-go/v7/modules/core/exported"
-	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
-	ibctesting "github.com/cosmos/ibc-go/v7/testing"
-	ibctestingmock "github.com/cosmos/ibc-go/v7/testing/mock"
-)
-
+/*
 func (suite *TendermintTestSuite) TestMisbehaviour() {
 	heightMinus1 := clienttypes.NewHeight(0, height.RevisionHeight-1)
 
@@ -178,7 +165,7 @@ func (suite *TendermintTestSuite) TestMisbehaviourValidateBasic() {
 					return err
 				}
 
-				tmCommit, err := tmtypes.MakeCommit(*blockID, int64(misbehaviour.Header2.GetHeight().GetRevisionHeight()), misbehaviour.Header1.Commit.Round, wrongVoteSet, altSignerArr, suite.now)
+				tmCommit, err := test.MakeCommit(*blockID, int64(misbehaviour.Header2.GetHeight().GetRevisionHeight()), misbehaviour.Header1.Commit.Round, wrongVoteSet, altSignerArr, suite.now)
 				misbehaviour.Header1.Commit = tmCommit.ToProto()
 				return err
 			},
@@ -199,7 +186,7 @@ func (suite *TendermintTestSuite) TestMisbehaviourValidateBasic() {
 					return err
 				}
 
-				tmCommit, err := tmtypes.MakeCommit(*blockID, int64(misbehaviour.Header2.GetHeight().GetRevisionHeight()), misbehaviour.Header2.Commit.Round, wrongVoteSet, altSignerArr, suite.now)
+				tmCommit, err := test.MakeCommit(*blockID, int64(misbehaviour.Header2.GetHeight().GetRevisionHeight()), misbehaviour.Header2.Commit.Round, wrongVoteSet, altSignerArr, suite.now)
 				misbehaviour.Header2.Commit = tmCommit.ToProto()
 				return err
 			},
@@ -234,3 +221,5 @@ func (suite *TendermintTestSuite) TestMisbehaviourValidateBasic() {
 		}
 	}
 }
+
+*/

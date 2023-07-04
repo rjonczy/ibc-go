@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
@@ -111,7 +112,21 @@ func (msg MsgTransfer) ValidateBasic() error {
 
 // GetSignBytes implements legacytx.LegacyMsg
 func (msg MsgTransfer) GetSignBytes() []byte {
-	return sdk.MustSortJSON(AminoCdc.MustMarshalJSON(&msg))
+	return mustSortJSON(amino.MustMarshalJSON(&msg))
+}
+
+// Deprecated: please delete this code eventually.
+func mustSortJSON(bz []byte) []byte {
+	var c any
+	err := json.Unmarshal(bz, &c)
+	if err != nil {
+		panic(err)
+	}
+	js, err := json.Marshal(c)
+	if err != nil {
+		panic(err)
+	}
+	return js
 }
 
 // GetSigners implements sdk.Msg
