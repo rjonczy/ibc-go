@@ -545,6 +545,7 @@ func (suite *KeeperTestSuite) TestJSONOnRecvPacket() {
 
 				err = suite.chainB.GetSimApp().GovKeeper.SetProposal(suite.chainB.GetContext(), proposal)
 				suite.Require().NoError(err)
+
 				err = suite.chainB.GetSimApp().GovKeeper.ActivateVotingPeriod(suite.chainB.GetContext(), proposal)
 				suite.Require().NoError(err)
 
