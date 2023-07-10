@@ -69,8 +69,7 @@ func (suite *CapabilityTestSuite) TestInitializeMemStore() {
 	prevGas := ctx.BlockGasMeter().GasConsumed()
 
 	restartedModule := capability.NewAppModule(suite.cdc, *newKeeper, true)
-	err = restartedModule.BeginBlock(ctx)
-	suite.Require().NoError(err)
+	restartedModule.BeginBlock(ctx)
 	gasUsed := ctx.GasMeter().GasConsumed()
 
 	suite.Require().True(newKeeper.IsInitialized(ctx), "memstore initialized flag not set")
