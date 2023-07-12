@@ -4,12 +4,16 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"math"
 	"strings"
 
 	cosmwasm "github.com/CosmWasm/wasmvm"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/store/prefix"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -130,10 +134,31 @@ func (k Keeper) importWasmCode(ctx sdk.Context, codeIDKey, wasmCode []byte) erro
 	return nil
 }
 
-func (k Keeper) IterateCodeInfos(ctx sdk.Context, fn func(id uint64, codeID string) (stop bool)) {
+// TODO: testing
+func (k Keeper) IterateCodeInfos(ctx sdk.Context, fn func(codeID string) (stop bool)) {
+	store := ctx.KVStore(k.storeKey)
+	prefixStore := prefix.NewStore(store, []byte(fmt.Sprintf("%s/", types.KeyCodeIDPrefix)))
 
+	iter := prefixStore.Iterator(nil, nil)
+	defer iter.Close()
+
+	for ; iter.Valid(); iter.Next() {
+		if fn(string(iter.Value())) {
+			break
+		}
+	}
 }
 
+// TODO: testing
 func (k Keeper) GetWasmByte(ctx sdk.Context, codeID string) ([]byte, error) {
-	return nil, nil
+	store := ctx.KVStore(k.storeKey)
+
+	byteCodeID, err := hex.DecodeString(codeID)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid code ID")
+	}
+
+	codeKey := types.CodeIDKey(byteCodeID)
+	wasmBytes := store.Get(codeKey)
+	return wasmBytes, nil
 }
