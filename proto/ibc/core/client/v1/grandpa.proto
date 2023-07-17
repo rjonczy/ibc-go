@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package ibc.core.client.v1;
+
+option go_package = "github.com/cosmos/ibc-go/v7/modules/core/02-client/types";
+
+import "ibc/core/client/v1/client.proto";
+import "gogoproto/gogo.proto";
+
+// GenesisState defines the ibc client submodule's genesis state.
+message GrandpaClientState {
+  // client states with their corresponding identifiers
+  bytes relay_chain = 1 [(gogoproto.moretags) = "yaml:\relay_chain"];
+  // consensus states from each client
+  uint32 latest_relay_height = 2 [(gogoproto.moretags) = "yaml:\"latest_relay_height\""];
+  // metadata from each client
+  uint32 latest_relay_hash = 3
+      [(gogoproto.moretags) = "yaml:\"latest_relay_hash\""];
+  GranpdaHeight frozen_height = 4 [(gogoproto.moretags) = "yaml:\"frozen_height\""];
+  // create localhost on initialization
+  uint32 latest_para_height = 5 [(gogoproto.moretags) = "yaml:\"latest_para_height\""];
+  uint32 para_id = 6 [(gogoproto.moretags) = "yaml:\"para_id\""];
+  uint64 current_set_id = 7 [(gogoproto.moretags) = "yaml:\"current_set_id\""];
+  repeated Authority current_authorities = 8 [
+   (gogoproto.nullable) = false,
+   (gogoproto.moretags) = "yaml:\"current_authorities\""
+   ];
+}
+
+message GranpdaHeight {
+    uint64 revision_number = 1 [(gogoproto.moretags) = "yaml:\revision_number"];
+
+    uint64 revision_height = 2 [(gogoproto.moretags) = "yaml:\revision_height"];
+}
+
+message Authority {
+    uint32 authority_id = 1 [(gogoproto.moretags) = "yaml:\authority_id"];
+
+    uint64 authority_weight = 2 [(gogoproto.moretags) = "yaml:\authority_weight"];
+}
