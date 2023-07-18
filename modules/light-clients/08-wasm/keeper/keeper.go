@@ -98,6 +98,7 @@ func (k Keeper) storeWasmCode(ctx sdk.Context, code []byte) ([]byte, error) {
 }
 
 func (k Keeper) importWasmCode(ctx sdk.Context, codeHash, wasmCode []byte) error {
+	fmt.Println("iiiiiiiiiiiiiiiii")
 	store := ctx.KVStore(k.storeKey)
 	if IsGzip(wasmCode) {
 		var err error
