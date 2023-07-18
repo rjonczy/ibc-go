@@ -23,11 +23,11 @@ func (m *ClientState) Validate() error {
 	panic("unimplemented")
 }
 
-func (m *ClientState) Status(ctx types.Context, clientStore types.KVStore, cdc codec.BinaryCodec) exported.Status {
+func (m *ClientState) Status(_ types.Context, _ types.KVStore, _ codec.BinaryCodec) exported.Status {
 	panic("unimplemented")
 }
 
-func (m *ClientState) ExportMetadata(clientStore types.KVStore) []exported.GenesisMetadata {
+func (m *ClientState) ExportMetadata(_ types.KVStore) []exported.GenesisMetadata {
 	panic("unimplemented")
 }
 
@@ -35,42 +35,42 @@ func (m *ClientState) ZeroCustomFields() exported.ClientState {
 	panic("unimplemented")
 }
 
-func (m *ClientState) GetTimestampAtHeight(ctx types.Context, clientStore types.KVStore, cdc codec.BinaryCodec, height exported.Height) (uint64, error) {
+func (m *ClientState) GetTimestampAtHeight(_ types.Context, _ types.KVStore, _ codec.BinaryCodec, _ exported.Height) (uint64, error) {
 	panic("unimplemented")
 }
 
-func (m *ClientState) Initialize(ctx types.Context, cdc codec.BinaryCodec, clientStore types.KVStore, consensusState exported.ConsensusState) error {
+func (m *ClientState) Initialize(_ types.Context, _ codec.BinaryCodec, _ types.KVStore, _ exported.ConsensusState) error {
 	panic("unimplemented")
 }
 
-func (m *ClientState) VerifyMembership(ctx types.Context, clientStore types.KVStore, cdc codec.BinaryCodec, height exported.Height, delayTimePeriod uint64, delayBlockPeriod uint64, proof []byte, path exported.Path, value []byte) error {
+func (m *ClientState) VerifyMembership(_ types.Context, _ types.KVStore, _ codec.BinaryCodec, _ exported.Height, _ uint64, _ uint64, _ []byte, _ exported.Path, _ []byte) error {
 	panic("unimplemented")
 }
 
-func (m *ClientState) VerifyNonMembership(ctx types.Context, clientStore types.KVStore, cdc codec.BinaryCodec, height exported.Height, delayTimePeriod uint64, delayBlockPeriod uint64, proof []byte, path exported.Path) error {
+func (m *ClientState) VerifyNonMembership(_ types.Context, _ types.KVStore, _ codec.BinaryCodec, _ exported.Height, _ uint64, _ uint64, _ []byte, _ exported.Path) error {
 	panic("unimplemented")
 }
 
-func (m *ClientState) VerifyClientMessage(ctx types.Context, cdc codec.BinaryCodec, clientStore types.KVStore, clientMsg exported.ClientMessage) error {
+func (m *ClientState) VerifyClientMessage(_ types.Context, _ codec.BinaryCodec, _ types.KVStore, _ exported.ClientMessage) error {
 	panic("unimplemented")
 }
 
-func (m *ClientState) CheckForMisbehaviour(ctx types.Context, cdc codec.BinaryCodec, clientStore types.KVStore, clientMsg exported.ClientMessage) bool {
+func (m *ClientState) CheckForMisbehaviour(_ types.Context, _ codec.BinaryCodec, _ types.KVStore, _ exported.ClientMessage) bool {
 	panic("unimplemented")
 }
 
-func (m *ClientState) UpdateStateOnMisbehaviour(ctx types.Context, cdc codec.BinaryCodec, clientStore types.KVStore, clientMsg exported.ClientMessage) {
+func (m *ClientState) UpdateStateOnMisbehaviour(_ types.Context, _ codec.BinaryCodec, _ types.KVStore, _ exported.ClientMessage) {
 	panic("unimplemented")
 }
 
-func (m *ClientState) UpdateState(ctx types.Context, cdc codec.BinaryCodec, clientStore types.KVStore, clientMsg exported.ClientMessage) []exported.Height {
+func (m *ClientState) UpdateState(_ types.Context, _ codec.BinaryCodec, _ types.KVStore, _ exported.ClientMessage) []exported.Height {
 	panic("unimplemented")
 }
 
-func (m *ClientState) CheckSubstituteAndUpdateState(ctx types.Context, cdc codec.BinaryCodec, subjectClientStore, substituteClientStore types.KVStore, substituteClient exported.ClientState) error {
+func (m *ClientState) CheckSubstituteAndUpdateState(_ types.Context, _ codec.BinaryCodec, _, _ types.KVStore, _ exported.ClientState) error {
 	panic("unimplemented")
 }
 
-func (m *ClientState) VerifyUpgradeAndUpdateState(ctx types.Context, cdc codec.BinaryCodec, store types.KVStore, newClient exported.ClientState, newConsState exported.ConsensusState, proofUpgradeClient, proofUpgradeConsState []byte) error {
+func (m *ClientState) VerifyUpgradeAndUpdateState(_ types.Context, _ codec.BinaryCodec, _ types.KVStore, _ exported.ClientState, _ exported.ConsensusState, _, _ []byte) error {
 	panic("unimplemented")
 }
