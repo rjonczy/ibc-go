@@ -46,6 +46,14 @@ func (q Keeper) ClientState(c context.Context, req *types.QueryClientStateReques
 	}
 
 	proofHeight := types.GetSelfHeight(ctx)
+
+	var grandpaState types.GrandpaClientState
+
+	err = q.cdc.Unmarshal(any.Value, &grandpaState)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	fmt.Println("grandpaState :", grandpaState)
 	return &types.QueryClientStateResponse{
 		ClientState: any,
 		ProofHeight: proofHeight,
