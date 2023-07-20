@@ -6,7 +6,9 @@ import (
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	wasmtypes "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 
 	"github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	commitmenttypes "github.com/cosmos/ibc-go/v7/modules/core/23-commitment/types"
@@ -205,4 +207,70 @@ func QuerySelfConsensusState(clientCtx client.Context) (*ibctm.ConsensusState, i
 	}
 
 	return state, height, nil
+}
+
+func MaybeDecodeWasmData(clientCtx client.Context, any *codectypes.Any) {
+	switch any.TypeUrl {
+	case "/ibc.lightclients.wasm.v1.ClientState":
+		var state wasmtypes.ClientState
+		err := clientCtx.Codec.Unmarshal(any.Value, &state)
+		if err == nil {
+			var innerAny codectypes.Any
+			err = clientCtx.Codec.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				state.XInner = &wasmtypes.ClientState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	case "/ibc.lightclients.wasm.v1.ConsensusState":
+		var state wasmtypes.ConsensusState
+		err := clientCtx.Codec.Unmarshal(any.Value, &state)
+		if err == nil {
+			var innerAny codectypes.Any
+			err = clientCtx.Codec.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				state.XInner = &wasmtypes.ConsensusState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	}
+}
+
+func DecodeWasmData(cdc codec.BinaryCodec, any *codectypes.Any) {
+	switch any.TypeUrl {
+	case "/ibc.lightclients.wasm.v1.ClientState":
+		var state wasmtypes.ClientState
+		err := cdc.Unmarshal(any.Value, &state)
+		if err == nil {
+			var innerAny codectypes.Any
+			err = cdc.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				state.XInner = &wasmtypes.ClientState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	case "/ibc.lightclients.wasm.v1.ConsensusState":
+		var state wasmtypes.ConsensusState
+		err := cdc.Unmarshal(any.Value, &state)
+		if err == nil {
+			var innerAny codectypes.Any
+			err = cdc.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				state.XInner = &wasmtypes.ConsensusState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	}
 }

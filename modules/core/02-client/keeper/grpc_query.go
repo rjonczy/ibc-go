@@ -11,6 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/cosmos/ibc-go/v7/modules/core/02-client/client/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -44,6 +45,8 @@ func (q Keeper) ClientState(c context.Context, req *types.QueryClientStateReques
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+
+	utils.DecodeWasmData(q.cdc, any)
 
 	proofHeight := types.GetSelfHeight(ctx)
 	return &types.QueryClientStateResponse{
@@ -81,6 +84,8 @@ func (q Keeper) ClientStates(c context.Context, req *types.QueryClientStatesRequ
 		}
 
 		identifiedClient := types.NewIdentifiedClientState(clientID, clientState)
+		utils.DecodeWasmData(q.cdc, identifiedClient.ClientState)
+
 		clientStates = append(clientStates, identifiedClient)
 		return true, nil
 	})
@@ -136,6 +141,7 @@ func (q Keeper) ConsensusState(c context.Context, req *types.QueryConsensusState
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	utils.DecodeWasmData(q.cdc, any)
 	proofHeight := types.GetSelfHeight(ctx)
 	return &types.QueryConsensusStateResponse{
 		ConsensusState: any,
@@ -173,8 +179,10 @@ func (q Keeper) ConsensusStates(c context.Context, req *types.QueryConsensusStat
 		if err != nil {
 			return false, err
 		}
+		state := types.NewConsensusStateWithHeight(height, consensusState)
+		utils.DecodeWasmData(q.cdc, state.ConsensusState)
 
-		consensusStates = append(consensusStates, types.NewConsensusStateWithHeight(height, consensusState))
+		consensusStates = append(consensusStates, state)
 		return true, nil
 	})
 	if err != nil {

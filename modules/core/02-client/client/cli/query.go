@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -50,7 +51,7 @@ func GetCmdQueryClientStates() *cobra.Command {
 			}
 
 			for _, cs := range res.ClientStates {
-				maybeDecodeWasmData(clientCtx, cs.ClientState)
+				utils.MaybeDecodeWasmData(clientCtx, cs.ClientState)
 			}
 
 			return clientCtx.PrintProto(res)
@@ -84,7 +85,7 @@ func GetCmdQueryClientState() *cobra.Command {
 				return err
 			}
 
-			maybeDecodeWasmData(clientCtx, clientStateRes.ClientState)
+			utils.MaybeDecodeWasmData(clientCtx, clientStateRes.ClientState)
 
 			return clientCtx.PrintProto(clientStateRes)
 		},
@@ -165,7 +166,7 @@ func GetCmdQueryConsensusStates() *cobra.Command {
 			}
 
 			for _, cs := range res.ConsensusStates {
-				maybeDecodeWasmData(clientCtx, cs.ConsensusState)
+				utils.MaybeDecodeWasmData(clientCtx, cs.ConsensusState)
 			}
 
 			return clientCtx.PrintProto(res)
@@ -257,7 +258,7 @@ If the '--latest' flag is included, the query returns the latest consensus state
 				return err
 			}
 
-			maybeDecodeWasmData(clientCtx, csRes.ConsensusState)
+			utils.MaybeDecodeWasmData(clientCtx, csRes.ConsensusState)
 
 			return clientCtx.PrintProto(csRes)
 		},
@@ -349,7 +350,7 @@ func GetCmdClientParams() *cobra.Command {
 	return cmd
 }
 
-func maybeDecodeWasmData(clientCtx client.Context, any *codectypes.Any) {
+func MaybeDecodeWasmData(clientCtx client.Context, any *codectypes.Any) {
 	switch any.TypeUrl {
 	case "/ibc.lightclients.wasm.v1.ClientState":
 		var state wasmtypes.ClientState
