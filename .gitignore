@@ -58,4 +58,3 @@ dependency-graph.png
 *.history
 
 tmp/
-*.wasm
