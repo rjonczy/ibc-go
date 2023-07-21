@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"fmt"
+	"os"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,6 +13,7 @@ import (
 	"github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
+	wasmtypes "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 	ibctesting "github.com/cosmos/ibc-go/v7/testing"
 )
 
@@ -56,6 +58,33 @@ func (suite *KeeperTestSuite) TestQueryClientState() {
 				suite.coordinator.SetupClients(path)
 
 				var err error
+				expClientState, err = types.PackClientState(path.EndpointA.GetClientState())
+				suite.Require().NoError(err)
+
+				req = &types.QueryClientStateRequest{
+					ClientId: path.EndpointA.ClientID,
+				}
+			},
+			true,
+		},
+		{
+			"success for wasm",
+			func() {
+				var err error
+				var grandpaContract []byte
+				grandpaContract, err = os.ReadFile("../testdata/ics10_grandpa_cw.wasm")
+				suite.Require().NoError(err)
+
+				msg := wasmtypes.NewMsgPushNewWasmCode(suite.chainA.GetSimApp().GovKeeper.GetAuthority(), grandpaContract)
+				res, err := suite.chainA.GetSimApp().WasmClientKeeper.PushNewWasmCode(suite.chainA.GetContext(), msg)
+				suite.Require().NoError(err)
+
+				suite.chainA.WasmClient = true
+				suite.coordinator.CodeID = res.CodeId
+
+				path := ibctesting.NewPath(suite.chainA, suite.chainB)
+				suite.coordinator.SetupClients(path)
+
 				expClientState, err = types.PackClientState(path.EndpointA.GetClientState())
 				suite.Require().NoError(err)
 
