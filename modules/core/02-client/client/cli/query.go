@@ -84,8 +84,9 @@ func GetCmdQueryClientState() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println("lmaooo")
-
+			fmt.Println("before: ", clientStateRes.ClientState)
+			maybeDecodeWasmData(clientCtx, clientStateRes.ClientState)
+			fmt.Println("after: ", clientStateRes.ClientState)
 			return clientCtx.PrintProto(clientStateRes)
 		},
 	}
