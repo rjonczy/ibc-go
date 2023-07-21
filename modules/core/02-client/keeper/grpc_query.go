@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -14,9 +15,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 	"github.com/cosmos/ibc-go/v7/modules/core/exported"
+	wasmtypes "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 )
 
 var _ types.QueryServer = Keeper{}
@@ -46,6 +49,8 @@ func (q Keeper) ClientState(c context.Context, req *types.QueryClientStateReques
 	}
 
 	proofHeight := types.GetSelfHeight(ctx)
+	maybeDecodeWasmData(q.cdc, any)
+
 	return &types.QueryClientStateResponse{
 		ClientState: any,
 		ProofHeight: proofHeight,
@@ -327,4 +332,41 @@ func (q Keeper) UpgradedConsensusState(c context.Context, req *types.QueryUpgrad
 	return &types.QueryUpgradedConsensusStateResponse{
 		UpgradedConsensusState: any,
 	}, nil
+}
+
+func maybeDecodeWasmData(cdc codec.BinaryCodec, any *codectypes.Any) {
+	switch any.TypeUrl {
+	case "/ibc.lightclients.wasm.v1.ClientState":
+		fmt.Println("decoding")
+		var state wasmtypes.ClientState
+		err := cdc.Unmarshal(any.Value, &state)
+		if err == nil {
+			fmt.Println("??")
+			var innerAny codectypes.Any
+			err = cdc.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				fmt.Println("here??")
+				state.XInner = &wasmtypes.ClientState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	case "/ibc.lightclients.wasm.v1.ConsensusState":
+		fmt.Println("never??")
+		var state wasmtypes.ConsensusState
+		err := cdc.Unmarshal(any.Value, &state)
+		if err == nil {
+			var innerAny codectypes.Any
+			err = cdc.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				state.XInner = &wasmtypes.ConsensusState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	}
 }

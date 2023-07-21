@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -83,8 +84,6 @@ func GetCmdQueryClientState() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			maybeDecodeWasmData(clientCtx, clientStateRes.ClientState)
 
 			return clientCtx.PrintProto(clientStateRes)
 		},
