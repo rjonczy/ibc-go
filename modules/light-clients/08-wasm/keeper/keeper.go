@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
-	"path/filepath"
 	"strings"
 
 	"google.golang.org/grpc/codes"
@@ -20,6 +19,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	sdkquery "github.com/cosmos/cosmos-sdk/types/query"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 )
@@ -31,9 +32,9 @@ type Keeper struct {
 	authority string
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey, authority string, homeDir string) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey) Keeper {
 	// Wasm VM
-	wasmDataDir := filepath.Join(homeDir, "wasm_client_data")
+	wasmDataDir := "wasm_client_data"
 	wasmSupportedFeatures := strings.Join([]string{"storage", "iterator"}, ",")
 	wasmMemoryLimitMb := uint32(math.Pow(2, 12))
 	wasmPrintDebug := true
@@ -46,12 +47,13 @@ func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey, authority string,
 	types.WasmVM = vm
 
 	// governance authority
+	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
 	return Keeper{
 		cdc:       cdc,
 		storeKey:  key,
 		wasmVM:    vm,
-		authority: authority,
+		authority: authority.String(),
 	}
 }
 
