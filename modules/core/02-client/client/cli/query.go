@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	wasmtypes "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/ibc-go/v7/modules/core/02-client/client/utils"
@@ -49,10 +47,6 @@ func GetCmdQueryClientStates() *cobra.Command {
 				return err
 			}
 
-			for _, cs := range res.ClientStates {
-				maybeDecodeWasmData(clientCtx, cs.ClientState)
-			}
-
 			return clientCtx.PrintProto(res)
 		},
 	}
@@ -83,8 +77,6 @@ func GetCmdQueryClientState() *cobra.Command {
 			if err != nil {
 				return err
 			}
-
-			maybeDecodeWasmData(clientCtx, clientStateRes.ClientState)
 
 			return clientCtx.PrintProto(clientStateRes)
 		},
@@ -162,10 +154,6 @@ func GetCmdQueryConsensusStates() *cobra.Command {
 			res, err := queryClient.ConsensusStates(cmd.Context(), req)
 			if err != nil {
 				return err
-			}
-
-			for _, cs := range res.ConsensusStates {
-				maybeDecodeWasmData(clientCtx, cs.ConsensusState)
 			}
 
 			return clientCtx.PrintProto(res)
@@ -257,8 +245,6 @@ If the '--latest' flag is included, the query returns the latest consensus state
 				return err
 			}
 
-			maybeDecodeWasmData(clientCtx, csRes.ConsensusState)
-
 			return clientCtx.PrintProto(csRes)
 		},
 	}
@@ -347,37 +333,4 @@ func GetCmdClientParams() *cobra.Command {
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
-}
-
-func maybeDecodeWasmData(clientCtx client.Context, any *codectypes.Any) {
-	switch any.TypeUrl {
-	case "/ibc.lightclients.wasm.v1.ClientState":
-		var state wasmtypes.ClientState
-		err := clientCtx.Codec.Unmarshal(any.Value, &state)
-		if err == nil {
-			var innerAny codectypes.Any
-			err = clientCtx.Codec.Unmarshal(state.Data, &innerAny)
-			if err == nil {
-				state.XInner = &wasmtypes.ClientState_Inner{Inner: &innerAny}
-				bts, err := state.Marshal()
-				if err == nil {
-					any.Value = bts
-				}
-			}
-		}
-	case "/ibc.lightclients.wasm.v1.ConsensusState":
-		var state wasmtypes.ConsensusState
-		err := clientCtx.Codec.Unmarshal(any.Value, &state)
-		if err == nil {
-			var innerAny codectypes.Any
-			err = clientCtx.Codec.Unmarshal(state.Data, &innerAny)
-			if err == nil {
-				state.XInner = &wasmtypes.ConsensusState_Inner{Inner: &innerAny}
-				bts, err := state.Marshal()
-				if err == nil {
-					any.Value = bts
-				}
-			}
-		}
-	}
 }
