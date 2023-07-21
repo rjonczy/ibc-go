@@ -50,6 +50,7 @@ func (q Keeper) ClientState(c context.Context, req *types.QueryClientStateReques
 
 	proofHeight := types.GetSelfHeight(ctx)
 	maybeDecodeWasmData(q.cdc, any)
+	fmt.Println("plssss")
 
 	return &types.QueryClientStateResponse{
 		ClientState: any,
