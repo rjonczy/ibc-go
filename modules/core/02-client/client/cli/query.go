@@ -84,6 +84,7 @@ func GetCmdQueryClientState() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			fmt.Println("lmaooo")
 
 			return clientCtx.PrintProto(clientStateRes)
 		},
