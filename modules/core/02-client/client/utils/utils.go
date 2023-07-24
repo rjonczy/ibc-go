@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	wasmtypes "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 
 	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -61,7 +63,10 @@ func QueryClientStateABCI(
 		return nil, err
 	}
 
+	MaybeDecodeWasmData(clientCtx.Codec, anyClientState)
+
 	clientStateRes := types.NewQueryClientStateResponse(anyClientState, proofBz, proofHeight)
+
 	return clientStateRes, nil
 }
 
@@ -113,6 +118,8 @@ func QueryConsensusStateABCI(
 	if err != nil {
 		return nil, err
 	}
+
+	MaybeDecodeWasmData(clientCtx.Codec, anyConsensusState)
 
 	return types.NewQueryConsensusStateResponse(anyConsensusState, proofBz, proofHeight), nil
 }
@@ -205,4 +212,37 @@ func QuerySelfConsensusState(clientCtx client.Context) (*ibctm.ConsensusState, i
 	}
 
 	return state, height, nil
+}
+
+func MaybeDecodeWasmData(codec codec.BinaryCodec, any *codectypes.Any) {
+	switch any.TypeUrl {
+	case "/ibc.lightclients.wasm.v1.ClientState":
+		var state wasmtypes.ClientState
+		err := codec.Unmarshal(any.Value, &state)
+		if err == nil {
+			var innerAny codectypes.Any
+			err = codec.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				state.XInner = &wasmtypes.ClientState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	case "/ibc.lightclients.wasm.v1.ConsensusState":
+		var state wasmtypes.ConsensusState
+		err := codec.Unmarshal(any.Value, &state)
+		if err == nil {
+			var innerAny codectypes.Any
+			err = codec.Unmarshal(state.Data, &innerAny)
+			if err == nil {
+				state.XInner = &wasmtypes.ConsensusState_Inner{Inner: &innerAny}
+				bts, err := state.Marshal()
+				if err == nil {
+					any.Value = bts
+				}
+			}
+		}
+	}
 }
