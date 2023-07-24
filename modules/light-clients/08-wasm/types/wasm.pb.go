@@ -32,7 +32,7 @@ type ClientState struct {
 	LatestHeight types.Height `protobuf:"bytes,3,opt,name=latest_height,json=latestHeight,proto3" json:"latest_height" yaml:"latest_height"`
 	// Types that are valid to be assigned to XInner:
 	//	*ClientState_Inner
-	XInner isClientState_XInner `protobuf_oneof:"_inner"`
+	XInner isClientState_XInner `protobuf_oneof:"_inner" json:",omitempty"`
 }
 
 func (m *ClientState) Reset()         { *m = ClientState{} }
@@ -109,7 +109,7 @@ type ConsensusState struct {
 	Timestamp uint64 `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// Types that are valid to be assigned to XInner:
 	//	*ConsensusState_Inner
-	XInner isConsensusState_XInner `protobuf_oneof:"_inner"`
+	XInner isConsensusState_XInner `protobuf_oneof:"_inner" json:",omitempty"`
 }
 
 func (m *ConsensusState) Reset()         { *m = ConsensusState{} }
@@ -184,7 +184,7 @@ type Header struct {
 	Height types.Height `protobuf:"bytes,2,opt,name=height,proto3" json:"height" yaml:"height"`
 	// Types that are valid to be assigned to XInner:
 	//	*Header_Inner
-	XInner isHeader_XInner `protobuf_oneof:"_inner"`
+	XInner isHeader_XInner `protobuf_oneof:"_inner" json:",omitempty"`
 }
 
 func (m *Header) Reset()         { *m = Header{} }
