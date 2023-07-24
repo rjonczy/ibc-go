@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/cosmos/ibc-go/v7/modules/core/02-client/client/utils"
 	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	connectiontypes "github.com/cosmos/ibc-go/v7/modules/core/03-connection/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/04-channel/types"
@@ -148,6 +149,7 @@ func (q Keeper) ChannelClientState(c context.Context, req *types.QueryChannelCli
 	}
 
 	identifiedClientState := clienttypes.NewIdentifiedClientState(clientID, clientState)
+	utils.MaybeDecodeWasmData(q.cdc, identifiedClientState.ClientState)
 
 	selfHeight := clienttypes.GetSelfHeight(ctx)
 	return types.NewQueryChannelClientStateResponse(identifiedClientState, nil, selfHeight), nil

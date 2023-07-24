@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/cosmos/ibc-go/v7/modules/core/02-client/client/utils"
 	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
 	"github.com/cosmos/ibc-go/v7/modules/core/03-connection/types"
 	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
@@ -133,6 +134,7 @@ func (q Keeper) ConnectionClientState(c context.Context, req *types.QueryConnect
 	}
 
 	identifiedClientState := clienttypes.NewIdentifiedClientState(connection.ClientId, clientState)
+	utils.MaybeDecodeWasmData(q.cdc, identifiedClientState.ClientState)
 
 	height := clienttypes.GetSelfHeight(ctx)
 	return types.NewQueryConnectionClientStateResponse(identifiedClientState, nil, height), nil
