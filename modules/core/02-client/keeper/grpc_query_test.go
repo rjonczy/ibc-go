@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 
@@ -107,6 +108,14 @@ func (suite *KeeperTestSuite) TestQueryClientState() {
 			res, err := suite.chainA.QueryServer.ClientState(ctx, req)
 
 			if tc.expPass {
+				// Print client state
+				out, err := suite.cdc.MarshalJSON(res.ClientState)
+				suite.Require().NoError(err)
+				buffer := new(bytes.Buffer)
+				buffer.Write(out)
+				suite.Require().NoError(err)
+				fmt.Println("client state:", buffer.String())
+
 				suite.Require().NoError(err)
 				suite.Require().NotNil(res)
 				suite.Require().Equal(expClientState, res.ClientState)
