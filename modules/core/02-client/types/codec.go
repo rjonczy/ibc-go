@@ -46,6 +46,10 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		&MsgUpgradeClient{},
 		&MsgSubmitMisbehaviour{},
 	)
+	registry.RegisterInterface(
+		"ibc.core.client.v2.ClientState",
+		(*exported.ClientState)(nil),
+	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
