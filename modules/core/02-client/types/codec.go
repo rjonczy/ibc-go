@@ -34,6 +34,10 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 		"ibc.core.client.v1.Misbehaviour",
 		(*exported.Misbehaviour)(nil),
 	)
+	registry.RegisterInterface(
+		"ibc.core.client.v2.ClientState",
+		(*exported.Misbehaviour)(nil),
+	)
 	registry.RegisterImplementations(
 		(*govtypes.Content)(nil),
 		&ClientUpdateProposal{},
