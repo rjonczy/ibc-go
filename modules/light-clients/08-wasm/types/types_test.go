@@ -252,8 +252,19 @@ func (suite *WasmTestSuite) TestUpdateWasmCodeIdWithErrors() {
 	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
 	suite.Require().Error(err)
 
+	// test non-existing code id
+	nonExistingCodeId := make([]byte, 32)
+	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, nonExistingCodeId, "08-wasm-0")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().Error(err)
+
 	// test invalid client id
-	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, newCodeId, "invalid")
+	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, newCodeId, "invalid\n")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().Error(err)
+
+	// test non-existing client id
+	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, newCodeId, "00-nonexist")
 	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
 	suite.Require().Error(err)
 }
