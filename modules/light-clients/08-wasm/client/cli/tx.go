@@ -35,10 +35,6 @@ func newPushNewWasmCodeCmd() *cobra.Command {
 				Signer: clientCtx.GetFromAddress().String(),
 			}
 
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -71,10 +67,6 @@ func newUpdateWasmCodeId() *cobra.Command {
 				ClientId: clientId,
 				CodeId:   codeId,
 				Signer:   clientCtx.GetFromAddress().String(),
-			}
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
 			}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)

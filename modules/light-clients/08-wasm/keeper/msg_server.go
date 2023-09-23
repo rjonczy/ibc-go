@@ -3,13 +3,10 @@ package keeper
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
-	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 	"github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/types"
 )
 
@@ -42,11 +39,6 @@ func (k Keeper) PushNewWasmCode(goCtx context.Context, msg *types.MsgPushNewWasm
 	return &types.MsgPushNewWasmCodeResponse{
 		CodeId: codeID,
 	}, nil
-}
-
-func (k Keeper) ClientStore(ctx sdk.Context, clientID string) sdk.KVStore {
-	clientPrefix := []byte(fmt.Sprintf("%s/%s/", host.KeyClientStorePrefix, clientID))
-	return prefix.NewStore(ctx.KVStore(k.storeKey), clientPrefix)
 }
 
 // UpdateWasmCodeId defines a rpc handler method for MsgUpdateWasmCodeId

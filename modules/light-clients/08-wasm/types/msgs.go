@@ -1,8 +1,10 @@
 package types
 
 import (
+	"github.com/cometbft/cometbft/crypto/tmhash"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	host "github.com/cosmos/ibc-go/v7/modules/core/24-host"
 )
 
 var TypeMsgPushNewWasmCode = "push_wasm_code"
@@ -72,10 +74,15 @@ func NewMsgUpdateWasmCodeId(signer string, codeId []byte, clientId string) *MsgU
 }
 
 func (m MsgUpdateWasmCodeId) ValidateBasic() error {
-	if len(m.CodeId) != 32 {
+	if len(m.CodeId) != tmhash.Size {
 		return sdkerrors.Wrapf(ErrWasmEmptyCode,
 			"invalid code id length (expected 32, got %d)", len(m.CodeId),
 		)
+	}
+
+	err := host.ClientIdentifierValidator(m.ClientId)
+	if err != nil {
+		return err
 	}
 
 	return nil
