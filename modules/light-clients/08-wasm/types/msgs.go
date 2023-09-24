@@ -63,8 +63,6 @@ func (msg MsgUpdateWasmCodeId) Route() string { return ModuleName }
 // Type Implements Msg.
 func (msg MsgUpdateWasmCodeId) Type() string { return TypeMsgUpdateWasmCodeId }
 
-// TODO: add tests for MsgUpdateWasmCodeId
-
 func NewMsgUpdateWasmCodeId(signer string, codeId []byte, clientId string) *MsgUpdateWasmCodeId {
 	return &MsgUpdateWasmCodeId{
 		Signer:   signer,
