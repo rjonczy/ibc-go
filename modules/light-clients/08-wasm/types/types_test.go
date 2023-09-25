@@ -209,6 +209,66 @@ func (suite *WasmTestSuite) TestPushNewWasmCodeWithErrors() {
 	suite.Require().Error(err)
 }
 
+func (suite *WasmTestSuite) TestUpdateWasmCodeId() {
+	suite.SetupWithChannel()
+	signer := authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	data, err := os.ReadFile("test_data/ics07_tendermint_cw.wasm.gz")
+	suite.Require().NoError(err)
+
+	msg := wasmtypes.NewMsgPushNewWasmCode(signer, data)
+	response, err := suite.wasmKeeper.PushNewWasmCode(suite.ctx, msg)
+	suite.Require().NoError(err)
+	newCodeId := response.CodeId
+
+	msgUpdate := wasmtypes.NewMsgUpdateWasmCodeId(signer, newCodeId, "08-wasm-0")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().NoError(err)
+
+	cs, ok := suite.chainA.App.GetIBCKeeper().ClientKeeper.GetClientState(suite.ctx, "08-wasm-0")
+	suite.Require().True(ok)
+	wasmCs, ok := cs.(*wasmtypes.ClientState)
+	suite.Require().True(ok)
+	suite.Require().Equal(newCodeId, wasmCs.CodeId)
+}
+
+func (suite *WasmTestSuite) TestUpdateWasmCodeIdWithErrors() {
+	suite.SetupWithEmptyClient()
+	signer := authtypes.NewModuleAddress(govtypes.ModuleName).String()
+	data, err := os.ReadFile("test_data/ics07_tendermint_cw.wasm.gz")
+	suite.Require().NoError(err)
+
+	msg := wasmtypes.NewMsgPushNewWasmCode(signer, data)
+	response, err := suite.wasmKeeper.PushNewWasmCode(suite.ctx, msg)
+	suite.Require().NoError(err)
+	newCodeId := response.CodeId
+
+	// test invalid signer
+	msgUpdate := wasmtypes.NewMsgUpdateWasmCodeId("invalid", newCodeId, "08-wasm-0")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().Error(err)
+
+	// test invalid code id
+	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, []byte{}, "08-wasm-0")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().Error(err)
+
+	// test non-existing code id
+	nonExistingCodeId := make([]byte, 32)
+	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, nonExistingCodeId, "08-wasm-0")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().Error(err)
+
+	// test invalid client id
+	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, newCodeId, "invalid\n")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().Error(err)
+
+	// test non-existing client id
+	msgUpdate = wasmtypes.NewMsgUpdateWasmCodeId(signer, newCodeId, "00-nonexist")
+	_, err = suite.wasmKeeper.UpdateWasmCodeId(suite.ctx, msgUpdate)
+	suite.Require().Error(err)
+}
+
 func (suite *WasmTestSuite) TestQueryWasmCode() {
 	// test invalid query request
 	_, err := suite.wasmKeeper.WasmCode(suite.ctx, &wasmtypes.WasmCodeQuery{})

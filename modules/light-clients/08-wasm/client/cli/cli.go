@@ -38,6 +38,7 @@ func NewTxCmd() *cobra.Command {
 
 	txCmd.AddCommand(
 		newPushNewWasmCodeCmd(),
+		newUpdateWasmCodeId(),
 	)
 
 	return txCmd

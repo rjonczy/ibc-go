@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	clientkeeper "github.com/cosmos/ibc-go/v7/modules/core/02-client/keeper"
 	"math"
 	"path/filepath"
 	"strings"
@@ -25,13 +26,14 @@ import (
 )
 
 type Keeper struct {
-	storeKey  storetypes.StoreKey
-	cdc       codec.BinaryCodec
-	wasmVM    *cosmwasm.VM
-	authority string
+	storeKey     storetypes.StoreKey
+	cdc          codec.BinaryCodec
+	wasmVM       *cosmwasm.VM
+	authority    string
+	clientKeeper *clientkeeper.Keeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey, authority string, homeDir string) Keeper {
+func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey, authority string, homeDir string, clientKeeper *clientkeeper.Keeper) Keeper {
 	// Wasm VM
 	wasmDataDir := filepath.Join(homeDir, "wasm_client_data")
 	wasmSupportedFeatures := strings.Join([]string{"storage", "iterator"}, ",")
@@ -48,10 +50,11 @@ func NewKeeper(cdc codec.BinaryCodec, key storetypes.StoreKey, authority string,
 	// governance authority
 
 	return Keeper{
-		cdc:       cdc,
-		storeKey:  key,
-		wasmVM:    vm,
-		authority: authority,
+		cdc:          cdc,
+		storeKey:     key,
+		wasmVM:       vm,
+		authority:    authority,
+		clientKeeper: clientKeeper,
 	}
 }
 

@@ -7,6 +7,9 @@ option go_package = "github.com/cosmos/ibc-go/v7/modules/light-clients/08-wasm/t
 service Msg {
   // PushNewWasmCode defines a rpc handler method for PushNewWasmCode.
   rpc PushNewWasmCode(MsgPushNewWasmCode) returns (MsgPushNewWasmCodeResponse);
+
+  // UpdateWasmCodeId defines a rpc handler method for UpdateWasmCodeId.
+  rpc UpdateWasmCodeId(MsgUpdateWasmCodeId) returns (MsgUpdateWasmCodeIdResponse);
 }
 
 // Message type to push new wasm code
@@ -18,4 +21,17 @@ message MsgPushNewWasmCode {
 // Response in case of successful handling
 message MsgPushNewWasmCodeResponse {
   bytes code_id = 1;
+}
+
+// Message type to update wasm code id
+message MsgUpdateWasmCodeId {
+  string signer    = 1;
+  string client_id = 2;
+  bytes  code_id   = 3;
+}
+
+// Response in case of successful handling
+message MsgUpdateWasmCodeIdResponse {
+  string client_id = 1;
+  bytes code_id = 2;
 }
