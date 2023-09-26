@@ -18,6 +18,7 @@ import (
 // provided LegacyAmino codec. These types are used for Amino JSON serialization
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgPushNewWasmCode{}, "ibc/MsgPushNewWasmCode")
+	legacy.RegisterAminoMsg(cdc, &MsgUpdateWasmCodeId{}, "ibc/MsgUpdateWasmCodeId")
 }
 
 // RegisterInterfaces registers the tendermint concrete client-related
@@ -42,6 +43,10 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgPushNewWasmCode{},
+	)
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
+		&MsgUpdateWasmCodeId{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
