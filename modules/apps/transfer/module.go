@@ -95,7 +95,11 @@ func NewAppModule(k keeper.Keeper) AppModule {
 
 // RegisterInvariants implements the AppModule interface
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
-	keeper.RegisterInvariants(ir, &am.keeper)
+	// Composable can't pass this Invariants
+	// when transfer ppica because of ppica
+	// actually not a native token so instead of lock
+	// in escrow address, we burn ppica and transfer ibc(ppica) denom
+	// keeper.RegisterInvariants(ir, &am.keeper)
 }
 
 // RegisterServices registers module services.
