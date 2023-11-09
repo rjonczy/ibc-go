@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"encoding/hex"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
@@ -16,9 +17,9 @@ var _ types.MsgServer = Keeper{}
 func (k Keeper) PushNewWasmCode(goCtx context.Context, msg *types.MsgPushNewWasmCode) (*types.MsgPushNewWasmCodeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if k.authority != msg.Signer {
-		return nil, sdkerrors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority: expected %s, got %s", k.authority, msg.Signer)
-	}
+	// if k.authority != msg.Signer {
+	// 	return nil, sdkerrors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority: expected %s, got %s", k.authority, msg.Signer)
+	// }
 
 	codeID, err := k.storeWasmCode(ctx, msg.Code)
 	if err != nil {
